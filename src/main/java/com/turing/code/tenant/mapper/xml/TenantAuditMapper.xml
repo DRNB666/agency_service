@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.turing.code.tenant.mapper.TenantAuditMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.turing.code.tenant.pojo.TenantAudit" autoMapping="true">
+        <id column="id" property="id" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, us_id, account, password, longitude, latitude, name, shop_name, industry_id, industry_name, city_name, city_code, area_name, area_code, address, invite_code, status, reason, audit_by, audit_time, pay_time, pay_status, remark
+    </sql>
+
+</mapper>

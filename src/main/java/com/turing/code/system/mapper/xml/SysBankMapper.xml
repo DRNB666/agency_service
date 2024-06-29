@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.turing.code.system.mapper.SysBankMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.turing.code.system.pojo.SysBank" autoMapping="true">
+        <id column="id" property="id" />
+    </resultMap>
+    <sql id="base_where">
+        <if test="sysBank.id != null">
+            and id = #{sysBank.id,jdbcType=INTEGER}
+        </if>
+        <if test="sysBank.bank != null">
+            and bank = #{sysBank.bank,jdbcType=VARCHAR}
+        </if>
+        <if test="sysBank.bankId != null">
+            and bank_id = #{sysBank.bankId,jdbcType=INTEGER}
+        </if>
+        <if test="sysBank.status != null">
+            and status = #{sysBank.status,jdbcType=INTEGER}
+        </if>
+        <if test="sysBank.createTime != null">
+            and create_time = #{sysBank.createTime,jdbcType=TIMESTAMP}
+        </if>
+    </sql>
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, bank, bank_id, status, create_time
+    </sql>
+    <select id="selectSelective"  resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from sys_bank
+        <where>
+            <include refid="base_where" />
+        </where>
+    </select>
+
+</mapper>

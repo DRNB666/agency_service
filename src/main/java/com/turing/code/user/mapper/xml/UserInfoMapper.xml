@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.turing.code.user.mapper.UserInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.turing.code.user.pojo.UserInfo" autoMapping="true">
+        <id column="id" property="id"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, tenant_id, open_id, nick, avatar, mobile, account, password, sex, royal, inviter_id,
+    inviter_code, regist_type, bind_time, version, longitude, address, latitude, remark,
+    name, level, status, login_time, promote_time, update_time, create_time
+    </sql>
+    <sql id="base_where">
+        <if test="userInfo.id != null">
+            and id = #{userInfo.id}
+        </if>
+        <if test="userInfo.tenantId != null">
+            and tenant_id = #{userInfo.tenantId}
+        </if>
+        <if test="userInfo.openId != null">
+            and open_id = #{userInfo.openId}
+        </if>
+        <if test="userInfo.nick != null">
+            and nick = #{userInfo.nick}
+        </if>
+        <if test="userInfo.avatar != null">
+            and avatar = #{userInfo.avatar}
+        </if>
+        <if test="userInfo.mobile != null">
+            and mobile = #{userInfo.mobile}
+        </if>
+        <if test="userInfo.account != null">
+            and account = #{userInfo.account}
+        </if>
+        <if test="userInfo.password != null">
+            and password = #{userInfo.password}
+        </if>
+        <if test="userInfo.sex != null">
+            and sex = #{userInfo.sex}
+        </if>
+        <if test="userInfo.royal != null">
+            and royal = #{userInfo.royal}
+        </if>
+        <if test="userInfo.inviterId != null">
+            and inviter_id = #{userInfo.inviterId}
+        </if>
+        <if test="userInfo.bindTime != null">
+            and bind_time = #{userInfo.bindTime}
+        </if>
+        <if test="userInfo.inviterCode != null">
+            and inviter_code = #{userInfo.inviterCode}
+        </if>
+        <if test="userInfo.registType != null">
+            and regist_type = #{userInfo.registType}
+        </if>
+        <if test="userInfo.version != null">
+            and version = #{userInfo.version}
+        </if>
+        <if test="userInfo.remark != null">
+            and remark = #{userInfo.remark}
+        </if>
+        <if test="userInfo.status != null">
+            and status = #{userInfo.status}
+        </if>
+        <if test="userInfo.level != null">
+            and level = #{userInfo.level}
+        </if>
+        <if test="userInfo.name != null">
+            and name = #{userInfo.name}
+        </if>
+        <if test="userInfo.loginTime != null">
+            and login_time = #{userInfo.loginTime}
+        </if>
+        <if test="userInfo.promoteTime != null">
+            and promote_time = #{userInfo.promoteTime}
+        </if>
+        <if test="userInfo.updateTime != null">
+            and update_time = #{userInfo.updateTime}
+        </if>
+        <if test="userInfo.address != null">
+            and address = #{userInfo.address}
+        </if>
+        <if test="userInfo.latitude != null">
+            and latitude = #{userInfo.latitude}
+        </if>
+        <if test="userInfo.longitude != null">
+            and longitude = #{userInfo.longitude}
+        </if>
+        <if test="userInfo.createTime != null">
+            and create_time = #{userInfo.createTime}
+        </if>
+    </sql>
+
+
+    <!--
+   userStatistics:用户端的推广统计
+   -->
+    <sql id="selectRoyal">
+        select
+        IFNULL(sum(amount),0)
+        from
+        user_royal_flow
+        where
+        type = 2
+        <if test="userId != null">
+            and user_id = #{userId}
+        </if>
+        <if test="userStatistics != null">
+            and (status = 1 or source_type in (11,12,13))
+        </if>
+        <if test="sourceIdNotNull != null">
+            and source_id is not null
+        </if>
+        <if test="startTime != null">
+            and create_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+            and create_time &lt;= #{endTime}
+        </if>
+        <if test="day != null">
+            and DATEDIFF(NOW(),create_time) &lt;= #{day, jdbcType=INTEGER}
+        </if>
+        <if test="cityCode != null">
+            and city_code = #{cityCode,jdbcType=INTEGER}
+        </if>
+        <if test="pushType != null">
+            and push_type = #{pushType,jdbcType=INTEGER}
+        </if>
+    </sql>
+    <select id="selectRoayalByDay" resultType="java.math.BigDecimal">
+        select
+        (
+        <include refid="selectRoyal"/>
+        )
+        +
+        (select
+        IFNULL(sum(sec_amount),0)
+        from
+        user_royal_flow_pro
+        where
+        status = 2
+        <if test="userId != null">
+            and agent_id = #{userId}
+        </if>
+        <if test="startTime != null">
+            and create_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+            and create_time &lt;= #{endTime}
+        </if>
+        <if test="day != null">
+            and DATEDIFF(NOW(),create_time) &lt;= #{day, jdbcType=INTEGER}
+        </if>
+        <if test="cityCode != null">
+            and city_code = #{cityCode,jdbcType=INTEGER}
+        </if>
+        ) amount
+    </select>
+    <select id="queryPublic" resultType="com.turing.code.user.pojo.UserInfo">
+        select
+        *
+        from
+        user_info
+        <if test="userInfo.status != null">
+            where status = #{userInfo.status}
+        </if>
+    </select>
+    <select id="selectSelective" resultType="com.turing.code.user.pojo.UserInfo">
+        select
+        <include refid="Base_Column_List"/>
+        from user_info
+        <where>
+            <include refid="base_where"/>
+        </where>
+    </select>
+
+    <select id="selectRoyalCount" resultType="java.lang.Integer">
+        select
+        count(1)
+        from
+        user_royal_flow
+        where
+        type = 2 and status = 1 and user_id = #{id}
+        <if test="type == 1">
+            and create_time &gt; DATE_FORMAT(CURDATE(),'%Y-%m-%d %H:%i:%s')
+        </if>
+        <if test="type == 2">
+            and create_time &gt; date_add(curdate(), interval - day(curdate()) + 1 day) and create_time &lt;
+            date_add(curdate()-day(curdate())+1,interval 1 month )
+        </if>
+    </select>
+    <select id="selectCountSelective" resultType="java.lang.Integer">
+        select
+        count(1)
+        from user_info
+        <where>
+            <include refid="base_where"/>
+        </where>
+    </select>
+    <select id="directCount" resultType="int">
+    SELECT COUNT(1) FROM user_info where inviter_id = #{userId}
+  </select>
+    <select id="indirectCount" resultType="int">
+    SELECT COUNT(1) FROM user_info where inviter_id in
+    (select id from user_info where inviter_id = #{userId})
+  </select>
+    <select id="selectByInviterId" resultType="java.lang.Integer">
+ select id from user_info where inviter_id = ${inviterId}
+    </select>
+    <select id="userList" resultType="com.turing.code.user.pojo.UserInfo">
+        select
+        *
+        from
+        user_info
+        <where>
+            <if test="param.level !=null and param.level.toString() !=''">
+                 AND level=#{param.level}
+            </if>
+            <if test="param.startTime !=null and param.startTime.toString() !=''">
+                 AND create_time between(#{param.startTime},#{param.endTime})
+            </if>
+            <if test="param.keyword !=null and param.keyword.toString() !=''">
+                 AND (nick like concat('%',#{param.keyword},'%'))
+                 or(id like concat('%',#{param.keyword},'%'))
+                 or (name like concat('%',#{param.keyword},'%'))
+
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+
+</mapper>

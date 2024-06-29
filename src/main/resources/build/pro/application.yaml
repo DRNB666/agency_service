@@ -1,0 +1,151 @@
+server:
+  port: 8080
+  tomcat:
+    max-http-post-size: 100MB  #请求参数长度
+    max-http-form-post-size: 100MB #form表单长度
+
+logging.level.com.turing.code: debug
+# 文件保存地址
+upLoadDir: /www/wwwroot/keying/files
+# 微信支付回调地址
+callBack: 127.0.0.1
+spring:
+  profiles:
+    # 环境值
+    active: @environment@
+
+  datasource:
+    druid:
+      driver-class-name: com.mysql.jdbc.Driver
+      url: jdbc:mysql://127.0.0.1:3306/keying?useUnicode=true&characterEncoding=utf8&useSSL=false&allowMultiQueries=true&serverTimezone=GMT%2B8
+      username: keying
+      password: hxbLAcPdFZJwfnG3
+
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
+  # springboot启动banner
+  banner:
+    location: classpath:banner.txt
+  # freemarker 相关配置
+  freemarker:
+    charset: UTF-8
+    suffix: .ftl
+    content-type: text/html;charset=utf-8
+    template-loader-path: classpath:/templates
+  mvc:
+    static-path-pattern: /static/**
+
+
+# 数据库备份相关配置
+backup:
+  mysql:
+    ip: 192.168.0.127
+    host: 3306
+    database: base_db
+
+# 是否生成swagger文档
+springfox:
+  documentation:
+    enabled: true
+
+#apifox配置
+ApiFox:
+  enabled: false
+  projectId: 4346627
+  Authorization: APS-zOsmuK9aZgYXXyFlOjvs3nPYPwq3qpe6
+
+# mybatis-plus 相关配置
+mybatis-plus:
+  mapper-locations: classpath:com/turing/**/mapper/xml/*.xml
+  global-config:
+    banner: false
+    db-config:
+      # 字段策略 IGNORED:"忽略判断",NOT_NULL:"非 NULL 判断"), NOT_EMPTY:"非空判断"
+      field-strategy: NOT_EMPTY
+      select-strategy: NOT_EMPTY
+  # 租户模式配置
+  tenant:
+    # 是否开启多租户模式
+    enable: false
+    # 设置租户id字段名
+    field-id: tenant_id
+    # 过滤不需要租户隔离的表
+    ignore-tables:
+      - tenant_info
+      - sys_db_backup
+      - ad_info
+      - ad_menu
+      - ad_profit
+      - ad_role
+      - ad_role_menu
+      - sys_timer_config
+      - sys_params
+#阿里短信参数配置
+ali:
+  sms:
+    # env 为环境参数, 如需线下测试短信请将参数改为 pro
+    env: ${spring.profiles.active}
+    #    env: pro
+    accessKeyId: xxx
+    accessKeySecret: xxx
+    signName: 签名
+    template:
+      # 验证码模板
+      code: xxx
+
+
+# redis 配置
+redis:
+  hostName: localhost
+  port: 6379
+  #    password: 123123
+  database: 1
+  # 连接超时时间 单位 ms（毫秒）
+  timeout: 3000
+  #=========redis线程池设置=========
+  pool:
+  # 连接池中的最大空闲连接，默认值也是8。
+  max-idle: 10
+  #连接池中的最小空闲连接，默认值也是0。
+  min-idle: 0
+  # 如果赋值为-1，则表示不限制；pool已经分配了maxActive个jedis实例，则此时pool的状态为exhausted(耗尽)。
+  max-active: 20
+  # 等待可用连接的最大时间，单位毫秒，默认值为-1，表示永不超时
+  max-wait: 5000
+
+# 微信相关配置
+wx:
+  # 公众号相关配置（示例）
+  mp:
+    # 公众号的appid
+    appId: xxx
+    # 公众号的appsecret
+    secret: xxx
+    # 接口配置里的Token值（可不填）
+    token: xxx
+    # 接口配置里的EncodingAESKey值（可不填）
+    aesKey: xxx
+  # 微信支付相关配置（示例）
+  pay:
+    # 微信公众号或者小程序等的appid
+    appId: wx5d64b4efc5076c1f
+    # 微信支付商户号
+    mchId: xxx
+    # 微信支付商户密钥
+    mchKey: xxx
+    # p12证书的位置，可以指定绝对路径，也可以指定类路径（以classpath:开头）
+    keyPath: D:/cert/apiclient_cert.p12
+  # 小程序相关配置
+  miniapp:
+    # 微信小程序的appid
+    appId: wx5d64b4efc5076c1f
+    # 微信小程序的Secret
+    secret: a394c039315d8aedab8781b9957ae2dd
+    # 微信小程序消息服务器配置的token（可不填）
+    token: xxx
+    # 微信小程序消息服务器配置的EncodingAESKey（可不填）
+    aesKey: xxx
+    # 微信小程序消息服务器配置的消息格式（可不填）
+    msgDataFormat: json

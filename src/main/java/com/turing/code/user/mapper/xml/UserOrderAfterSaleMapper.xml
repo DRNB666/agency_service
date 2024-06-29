@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.turing.code.user.mapper.UserOrderAfterSaleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.turing.code.user.pojo.UserOrderAfterSale" autoMapping="true">
+        <id column="id" property="id" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, status, remark, create_time, update_time, test_time, version, us_id, order_id, after_sell_status, after_sell_type, after_sell_category, reason, image, pro_id
+    </sql>
+
+</mapper>

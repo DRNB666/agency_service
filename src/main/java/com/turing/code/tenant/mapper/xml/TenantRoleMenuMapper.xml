@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.turing.code.tenant.mapper.TenantRoleMenuMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.turing.code.tenant.pojo.TenantRoleMenu" autoMapping="true">
+        <id column="id" property="id" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, role_id, menu_id, status, update_time, create_time, version
+    </sql>
+    <select id="selectRoleMenu" resultType="com.turing.code.tenant.pojo.TenantMenu">
+        select ar.role_id, ar.menu_id as id, ar.status, am.id as menu_id, am.menu_name, am.request_url, am.parent_id, am.flag, am.menu_icon, am.component
+        from tenant_role_menu ar
+        inner join tenant_menu am
+        on ar.menu_id = am.id
+        <where>
+        <if test="roleId != null">
+            and role_id = #{roleId}
+        </if>
+        </where>
+        order by am.sort desc
+    </select>
+
+</mapper>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.turing.code.user.mapper.UserBankCardMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.turing.code.user.pojo.UserBankCard" autoMapping="true">
+        <id column="id" property="id" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, us_id, card_name, type, card_num, name, bank_id, status, remark, create_time
+    </sql>
+    <sql id="base_where">
+        <if test="userBankCard.id != null">
+            and id = #{userBankCard.id,jdbcType=BIGINT}
+        </if>
+        <if test="userBankCard.usId != null">
+            and us_id = #{userBankCard.usId,jdbcType=BIGINT}
+        </if>
+        <if test="userBankCard.cardName != null">
+            and card_name = #{userBankCard.cardName,jdbcType=VARCHAR}
+        </if>
+        <if test="userBankCard.type != null">
+            and type = #{userBankCard.type,jdbcType=INTEGER}
+        </if>
+        <if test="userBankCard.cardNum != null">
+            and card_num = #{userBankCard.cardNum,jdbcType=VARCHAR}
+        </if>
+        <if test="userBankCard.name != null">
+            and name = #{userBankCard.name,jdbcType=VARCHAR}
+        </if>
+        <if test="userBankCard.bankId != null">
+            and bank_id = #{userBankCard.bankId,jdbcType=INTEGER}
+        </if>
+        <if test="userBankCard.status != null">
+            and status = #{userBankCard.status,jdbcType=INTEGER}
+        </if>
+        <if test="userBankCard.remark != null">
+            and remark = #{userBankCard.remark,jdbcType=VARCHAR}
+        </if>
+        <if test="userBankCard.createTime != null">
+            and create_time = #{userBankCard.createTime,jdbcType=TIMESTAMP}
+        </if>
+    </sql>
+    <select id="selectCountSelective" resultType="Integer">
+        select
+        count(1)
+        from user_bank_card
+        <where>
+            <include refid="base_where" />
+        </where>
+    </select>
+    <select id="selectSelective"  resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from user_bank_card
+        <where>
+            <include refid="base_where" />
+        </where>
+    </select>
+</mapper>

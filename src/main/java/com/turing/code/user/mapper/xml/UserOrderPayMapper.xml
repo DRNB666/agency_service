@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.turing.code.user.mapper.UserOrderPayMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.turing.code.user.pojo.UserOrderPay" autoMapping="true">
+        <id column="id" property="id"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, group_pro_id, create_time, pro_info, spike_id, team_id, tenant_id, phone, pro_id, shop_id, user_id, remark, status, update_time, type, discount_price, price, original_price, total_amount, pay_amount, freight, qr_code, coupon_user_id, coupon_amount, pay_time, sales, deal_time, count, express_num, express, carriage, address, consignee, after_sell_status, after_sell_type, city_code, user_remark, shipping_state, billing_status, sub_status, pre_pick_up, print_status, master_order, print_template, web_point_id, kdn_order, kdn_type, map_url
+    </sql>
+    <select id="orderList" resultType="com.turing.code.tenant.pojo.vo.TenantOrderVo">
+        SELECT
+        ui.`name` AS userName,
+        uo.*
+        FROM
+        `user_order` uo
+        LEFT JOIN user_info ui ON uo.us_id = ui.id
+        WHERE uo.tenant_id=#{param.pId}
+        <if test="param.orderId !=null and param.orderId.toString() !=''">
+            AND uo.order_id=#{param.orderId}
+        </if>
+        <if test="param.phone !=null and param.phone.toString() !=''">
+            AND ui.mobile=#{param.phone}
+        </if>
+        <if test="param.status !=null and param.status.toString() !=''">
+             AND uo.status=#{param.status}
+        </if>
+        <if test="param.type !=null and param.type.toString() !=''">
+            AND uo.type=#{param.type}
+        </if>
+        order by uo.create_time
+    </select>
+
+</mapper>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.turing.code.user.mapper.UserOrderMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.turing.code.user.pojo.UserOrder" autoMapping="true">
+        <id column="id" property="id"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, status, remark, create_time, update_time, test_time, version, us_id, total_amount, pay_time, pay_type, order_id, freight_amount, install_amount, delivery_category
+    </sql>
+    <select id="collectionProgressList" resultType="com.turing.code.user.pojo.UserOrder">
+        select
+        *
+        from
+        user_order uo left join user_info ui on uo.us_id= ui.id
+        where
+        uo.tenant_id = #{tenantId}
+        <if test="orderId != null">
+            and uo.order_id=#{orderId}
+        </if>
+        <if test="receiptStatus != null">
+            and uo.receipt_status=#{receiptStatus}
+        </if>
+        <if test="phone != null and phone != ''">
+            and ui.mobile=#{phone}
+        </if>
+    </select>
+
+</mapper>

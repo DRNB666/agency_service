@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.turing.code.tenant.mapper.TenantShopMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.turing.code.tenant.pojo.TenantShop" autoMapping="true">
+        <id column="id" property="id" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, tenant_id, longitude, latitude, address, content, shop_photo, banner, overview, name, attention, like, pv, status, remark, create_time, category_id, start_time, end_time, phone, icon, score
+    </sql>
+    <sql id="base_where">
+        <if test="map.tenantShop.id != null">
+            and id = #{map.tenantShop.id}
+        </if>
+        <if test="map.tenantShop.tenantId != null">
+            and tenant_id = #{map.tenantShop.tenantId}
+        </if>
+        <if test="map.tenantShop.longitude != null">
+            and longitude = #{map.tenantShop.longitude}
+        </if>
+        <if test="map.tenantShop.latitude != null">
+            and latitude = #{map.tenantShop.latitude}
+        </if>
+        <if test="map.tenantShop.address != null">
+            and address = #{map.tenantShop.address}
+        </if>
+        <if test="map.tenantShop.shopPhoto != null">
+            and shop_photo = #{map.tenantShop.shopPhoto}
+        </if>
+        <if test="map.tenantShop.banner != null">
+            and banner = #{map.tenantShop.banner}
+        </if>
+        <if test="map.tenantShop.overview != null">
+            and overview = #{map.tenantShop.overview}
+        </if>
+        <if test="map.tenantShop.name != null">
+            and name = #{map.tenantShop.name}
+        </if>
+        <if test="map.tenantShop.attention != null">
+            and attention = #{map.tenantShop.attention}
+        </if>
+        <if test="map.tenantShop.like != null">
+            and `like` = #{map.tenantShop.like}
+        </if>
+        <if test="map.tenantShop.pv != null">
+            and pv = #{map.tenantShop.pv}
+        </if>
+        <if test="map.tenantShop.status != null">
+            and status = #{map.tenantShop.status}
+        </if>
+        <if test="map.tenantShop.remark != null">
+            and remark = #{map.tenantShop.remark}
+        </if>
+        <if test="map.tenantShop.createTime != null">
+            and create_time = #{map.tenantShop.createTime}
+        </if>
+        <if test="map.tenantShop.categoryId != null">
+            and category_id = #{map.tenantShop.categoryId}
+        </if>
+        <if test="map.tenantShop.startTime != null">
+            and start_time = #{map.tenantShop.startTime}
+        </if>
+        <if test="map.tenantShop.endTime != null">
+            and end_time = #{map.tenantShop.endTime}
+        </if>
+        <if test="map.tenantShop.phone != null">
+            and phone = #{map.tenantShop.phone}
+        </if>
+        <if test="map.tenantShop.icon != null">
+            and icon = #{map.tenantShop.icon}
+        </if>
+        <if test="map.tenantShop.score != null">
+            and score = #{map.tenantShop.score}
+        </if>
+        <if test="map.tenantShop.content != null">
+            and content = #{map.tenantShop.content}
+        </if>
+    </sql>
+    <select id="selectSelective" resultType="com.turing.code.tenant.pojo.TenantShop">
+        select
+        <include refid="Base_Column_List" />
+        from tenant_shop
+        <where>
+            <include refid="base_where" />
+        </where>
+    </select>
+    <select id="selectMap" resultType="java.util.Map">
+        SELECT
+        shop.id,
+        shop.shop_photo as 'shopPhoto',
+        shop.tenant_id as 'tenantId',
+        shop.longitude,
+        shop.latitude,
+        shop.address,
+        shop.content,
+        shop.banner,
+        shop.overview,
+        shop.NAME as 'name',
+        shop.STATUS as 'status',
+        shop.remark,
+        shop.create_time as 'createTime',
+        shop.category_id as 'categoryId',
+        category.`name` as 'categoryName',
+        shop.start_time as 'startTime',
+        shop.end_time as 'endTime',
+        shop.phone,
+        u.nick as nick,
+        (select count(1) from tenant_invite where shop_id = shop.id) as salesNum
+        ,shop.score
+        FROM
+        tenant_shop shop
+        LEFT JOIN tenant_shop_category category ON shop.category_id = category.id
+        LEFT JOIN tenant_info info ON shop.tenant_id = info.id
+        LEFT JOIN user_info u ON u.tenant_id = info.id
+        <where>
+            <if test="map.tenantId != null">
+                and shop.tenant_id = #{map.tenantId,jdbcType=BIGINT}
+            </if>
+            <if test="map.categoryId != null">
+                and shop.category_id = #{map.categoryId,jdbcType=INTEGER}
+            </if>
+            <if test="map.status != null">
+                and shop.status = #{map.status,jdbcType=INTEGER}
+            </if>
+            <if test="map.name != null">
+                and shop.name like concat('%',#{map.name,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="map.startTime != null">
+                and shop.create_time &gt;= #{map.startTime}
+            </if>
+            <if test="map.endTime != null">
+                and shop.create_time &lt;= #{map.endTime}
+            </if>
+            <if test="map.cityCode != null">
+                and info.city_code = #{map.cityCode}
+            </if>
+        </where>
+        <if test="map.orderBy != null">
+            order by ${map.orderBy}
+        </if>
+        <if test="map.startPage != null">
+            limit #{map.startPage ,jdbcType=INTEGER}, #{map.pageSize ,jdbcType=INTEGER}
+        </if>
+    </select>
+
+</mapper>

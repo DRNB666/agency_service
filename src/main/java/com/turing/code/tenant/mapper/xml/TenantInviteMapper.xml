@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.turing.code.tenant.mapper.TenantInviteMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.turing.code.tenant.pojo.TenantInvite" autoMapping="true">
+        <id column="id" jdbcType="BIGINT" property="id" />
+        <result column="status" jdbcType="INTEGER" property="status" />
+        <result column="shop_id" jdbcType="BIGINT" property="shopId" />
+        <result column="tenant_id" jdbcType="BIGINT" property="tenantId" />
+        <result column="amount" jdbcType="DECIMAL" property="amount" />
+        <result column="pro_amount" jdbcType="DECIMAL" property="proAmount" />
+        <result column="user_id" jdbcType="BIGINT" property="userId" />
+        <result column="agent_id" jdbcType="BIGINT" property="agentId" />
+        <result column="grade" jdbcType="INTEGER" property="grade" />
+        <result column="real_name" jdbcType="VARCHAR" property="realName" />
+        <result column="is_inside" jdbcType="INTEGER" property="isInside" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, status, shop_id, tenant_id, amount, pro_amount, user_id, agent_id, grade, real_name, is_inside, remark, create_time, update_time
+    </sql>
+    <sql id="base_where">
+        <if test="id != null">
+            and id = #{id,jdbcType=BIGINT}
+        </if>
+        <if test="status != null">
+            and status = #{status,jdbcType=INTEGER}
+        </if>
+        <if test="shopId != null">
+            and shop_id = #{shopId,jdbcType=BIGINT}
+        </if>
+        <if test="tenantId != null">
+            and tenant_id = #{tenantId,jdbcType=BIGINT}
+        </if>
+        <if test="amount != null">
+            and amount = #{amount,jdbcType=DECIMAL}
+        </if>
+        <if test="proAmount != null">
+            and pro_amount = #{proAmount,jdbcType=DECIMAL}
+        </if>
+        <if test="userId != null">
+            and user_id = #{userId,jdbcType=BIGINT}
+        </if>
+        <if test="agentId != null">
+            and agent_id = #{agentId,jdbcType=BIGINT}
+        </if>
+        <if test="grade != null">
+            and grade = #{grade,jdbcType=INTEGER}
+        </if>
+        <if test="realName != null">
+            and real_name = #{realName,jdbcType=VARCHAR}
+        </if>
+        <if test="isInside != null">
+            and is_inside = #{isInside,jdbcType=INTEGER}
+        </if>
+        <if test="remark != null">
+            and remark = #{remark,jdbcType=VARCHAR}
+        </if>
+        <if test="createTime != null">
+            and create_time = #{createTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="updateTime != null">
+            and update_time = #{updateTime,jdbcType=TIMESTAMP}
+        </if>
+    </sql>
+    <select id="selectUserInviteShop" parameterType="Map" resultType="Map">
+    SELECT
+	s.name, i.id, s.shop_photo as shopPhoto, s.tenant_id as tenantId, i.amount
+    FROM
+	tenant_invite AS i
+	LEFT JOIN
+	tenant_shop AS s
+	ON
+	i.shop_id = s.id
+	WHERE i.status = 1
+	and i.user_id = #{userId}
+  </select>
+    <select id="selectSumProAmountByAgentId" parameterType="java.lang.Long" resultType="decimal">
+    SELECT
+    IFNULL(SUM(m.pro_amount),0)
+    FROM
+        tenant_invite m LEFT JOIN
+        user_info u ON m.user_id = u.id
+    WHERE
+        u.inviter_id = #{agentId}
+        AND m.shop_id = #{shopId}
+  </select>
+    <select id="selectOneByMap" parameterType="Map" resultMap="BaseResultMap">
+        select
+        <choose>
+            <when test="fields != null">
+                ${fields}
+            </when>
+            <otherwise>
+                <include refid="Base_Column_List" />
+            </otherwise>
+        </choose>
+        from tenant_invite
+        <where>
+            <include refid="base_where" />
+
+            <if test="startTime != null">
+                and create_time &gt;= #{startTime}
+            </if>
+            <if test="endTime != null">
+                and create_time &lt;= #{endTime}
+            </if>
+        </where>
+        <if test="orderBy != null">
+            order by ${orderBy}
+        </if>
+        limit 1
+    </select>
+    <resultMap id="MyResultMap" extends="BaseResultMap" type="com.turing.code.tenant.pojo.vo.TenantInviteVO">
+        <collection property="userInfoList" ofType="com.turing.code.user.pojo.UserInfo">
+            <id column="u_id" jdbcType="BIGINT" property="id" />
+            <result column="u_tenant_id" jdbcType="BIGINT" property="tenantId" />
+            <result column="u_nick" jdbcType="VARCHAR" property="nick" />
+            <result column="u_avatar" jdbcType="VARCHAR" property="avatar" />
+            <result column="u_mobile" jdbcType="VARCHAR" property="mobile" />
+            <result column="u_account" jdbcType="VARCHAR" property="account" />
+            <result column="u_sex" jdbcType="INTEGER" property="sex" />
+            <result column="u_royal" jdbcType="DECIMAL" property="royal" />
+            <result column="u_status" jdbcType="INTEGER" property="status" />
+            <result column="u_level" jdbcType="INTEGER" property="level" />
+            <result column="u_name" jdbcType="VARCHAR" property="name" />
+        </collection>
+    </resultMap>
+    <select id="selectByMapWithUser"  resultMap="MyResultMap">
+        SELECT
+        i.id,i.status,i.shop_id,i.tenant_id,i.amount,i.user_id,i.agent_id,i.grade,i.real_name,i.is_inside,
+        i.remark,uu.nick agent_nick,i.create_time,pro_amount,
+        u.id as u_id,u.tenant_id as u_tenant_id,u.nick as u_nick,u.avatar as u_avatar,u.mobile as u_mobile,u.account as u_account,
+        u.royal as u_royal,u.inviter_id as u_inviter_id,u.status as u_status,u.level as u_level,u.regist_type as u_regist_type
+        <if test="map.flagCount != null">
+            ,(SELECT count(1) from tenant_invite m left join user_info u on u.id = m.user_id where m.tenant_id = #{map.tenantId} and
+            u.inviter_id = i.user_id) invite_agent
+            ,(SELECT count(1) from user_info where inviter_id = i.user_id) invite_user
+            ,(SELECT IFNULL(SUM(pro_amount),0) FROM tenant_invite m LEFT JOIN user_info u ON u.id = m.user_id
+            WHERE u.inviter_id = i.user_id AND m.shop_id = i.shop_id) team_amount
+
+            ,(SELECT count(1) FROM user_royal_flow_pro WHERE status = 2
+            AND tenant_id = #{map.tenantId}
+            AND agent_id = i.user_id
+            AND type = 1
+            AND date_format(create_time, '%Y-%m-%d') = date_format(CURDATE(),'%Y-%m-%d')) order_count
+            ,(SELECT IFNULL(SUM(order_amount),0) FROM user_royal_flow_pro WHERE status = 2
+            AND tenant_id = #{map.tenantId}
+            AND agent_id = i.user_id
+            AND type = 1
+            AND date_format(create_time, '%Y-%m') = date_format(CURDATE(),'%Y-%m')) month_amount
+        </if>
+        FROM
+        tenant_invite AS i
+        left join
+        user_info AS u
+        ON i.user_id = u.id
+        left JOIN user_info AS uu
+        ON u.inviter_id = uu.id
+        <where>
+            <if test="map.userId != null">
+                and i.user_id = #{map.userId}
+            </if>
+            <if test="map.tenantId != null">
+                and i.tenant_id = #{map.tenantId}
+            </if>
+            <if test="map.agentId != null">
+                and u.inviter_id = #{map.agentId}
+            </if>
+            <if test="map.status != null">
+                and i.status = #{map.status}
+            </if>
+            <if test="map.shopId != null">
+                and i.shop_id = #{map.shopId}
+            </if>
+            <if test="map.isInside != null">
+                and i.is_inside = #{map.isInside}
+            </if>
+            <if test="map.grade != null">
+                and i.grade = #{map.grade}
+            </if>
+            <if test="map.nickLike != null">
+                and u.nick like concat('%',#{map.nickLike},'%')
+            </if>
+            <if test="map.nameLike != null">
+                and (u.nick like concat('%',#{map.nameLike},'%') or i.real_name like concat('%',#{map.nameLike},'%'))
+            </if>
+            <if test="map.mobile != null">
+                and u.mobile = #{map.mobile}
+            </if>
+            <if test="map.startTime != null">
+                and i.create_time &gt;= #{map.startTime}
+            </if>
+            <if test="map.endTime != null">
+                and i.create_time &lt;= #{map.endTime}
+            </if>
+        </where>
+        <if test="map.orderBy != null">
+            order by ${map.orderBy}
+        </if>
+    </select>
+
+</mapper>

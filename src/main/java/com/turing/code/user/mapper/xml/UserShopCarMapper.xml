@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.turing.code.user.mapper.UserShopCarMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.turing.code.user.pojo.UserShopCar">
+        <id column="id" property="id" />
+        <result column="status" property="status" />
+        <result column="remark" property="remark" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="test_time" property="testTime" />
+        <result column="version" property="version" />
+        <result column="pro_id" property="proId" />
+        <result column="sku_id" property="skuId" />
+        <result column="user_id" property="userId" />
+        <result column="count" property="count" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, status, remark, create_time, update_time, test_time, version, pro_id, sku_id, user_id, count
+    </sql>
+
+</mapper>

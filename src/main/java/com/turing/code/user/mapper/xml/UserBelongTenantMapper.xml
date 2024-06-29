@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.turing.code.user.mapper.UserBelongTenantMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.turing.code.user.pojo.UserBelongTenant" autoMapping="true">
+        <id column="id" property="id"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, status, remark, create_time, update_time, test_time, version, us_id, tenant_id, shop_id
+    </sql>
+    <select id="userList" resultType="com.turing.code.tenant.pojo.vo.TenantUserVo">
+        SELECT
+        ui.*
+        FROM
+        user_belong_tenant ubt
+        LEFT JOIN user_info ui ON ubt.us_id = ui.id
+        WHERE
+        ubt.tenant_id =#{param.pId}
+        <if test="param.keyword !=null and param.keyword.toString() !=''">
+            AND
+            (ui.mobile like concat('%',#{param.keyword},'%'))
+            OR
+            (ui.open_id like concat('%',#{param.keyword},'%'))
+            OR
+            (ui.id like concat('%',#{param.keyword},'%'))
+        </if>
+        <if test="param.level !=null and param.level.toString() !=''">
+             AND ui.level=#{param.level}
+        </if>
+        <if test="param.startTime !=null and param.startTime.toString() !=''">
+            AND ubt.create_time BETWEEN #{param.startTime} AND #{param.endTime}
+        </if>
+        ORDER BY ubt.create_time DESC
+    </select>
+
+</mapper>

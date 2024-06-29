@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.turing.code.tenant.mapper.TenantProIdentifiMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.turing.code.tenant.pojo.TenantProIdentifi" autoMapping="true">
+        <id column="id" property="id" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, sort, name, status, type, remark, create_time, update_time
+    </sql>
+    <sql id="base_where">
+        <if test="id != null">
+            and id = #{id,jdbcType=INTEGER}
+        </if>
+        <if test="sort != null">
+            and sort = #{sort,jdbcType=INTEGER}
+        </if>
+        <if test="name != null">
+            and name = #{name,jdbcType=VARCHAR}
+        </if>
+        <if test="status != null">
+            and status = #{status,jdbcType=INTEGER}
+        </if>
+        <if test="type != null">
+            and type = #{type,jdbcType=INTEGER}
+        </if>
+        <if test="remark != null">
+            and remark = #{remark,jdbcType=VARCHAR}
+        </if>
+        <if test="createTime != null">
+            and create_time = #{createTime,jdbcType=TIMESTAMP}
+        </if>
+        <if test="updateTime != null">
+            and update_time = #{updateTime,jdbcType=TIMESTAMP}
+        </if>
+    </sql>
+    <select id="selectSelective" resultType="com.turing.code.tenant.pojo.TenantProIdentifi">
+        select
+        <include refid="Base_Column_List" />
+        from tenant_pro_identifi
+        <where>
+            <include refid="base_where" />
+        </where>
+    </select>
+
+</mapper>

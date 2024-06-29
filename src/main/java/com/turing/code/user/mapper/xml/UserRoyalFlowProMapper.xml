@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.turing.code.user.mapper.UserRoyalFlowProMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.turing.code.user.pojo.UserRoyalFlowPro" autoMapping="true">
+        <id column="id" jdbcType="BIGINT" property="id" />
+        <result column="user_id" jdbcType="BIGINT" property="userId" />
+        <result column="agent_id" jdbcType="BIGINT" property="agentId" />
+        <result column="pro_id" jdbcType="BIGINT" property="proId" />
+        <result column="tenant_id" jdbcType="BIGINT" property="tenantId" />
+        <result column="shop_id" jdbcType="BIGINT" property="shopId" />
+        <result column="order_id" jdbcType="BIGINT" property="orderId" />
+        <result column="amount" jdbcType="DECIMAL" property="amount" />
+        <result column="sec_amount" jdbcType="DECIMAL" property="secAmount" />
+        <result column="order_amount" jdbcType="DECIMAL" property="orderAmount" />
+        <result column="type" jdbcType="INTEGER" property="type" />
+        <result column="status" jdbcType="INTEGER" property="status" />
+        <result column="city_code" jdbcType="INTEGER" property="cityCode" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, user_id, agent_id, pro_id, tenant_id, shop_id, order_id, amount, sec_amount, order_amount, type, status, city_code, remark, create_time, update_time
+    </sql>
+    <sql id="base_where">
+        <if test="map.id != null">
+            and id = #{map.id}
+        </if>
+        <if test="map.userId != null">
+            and user_id = #{map.userId}
+        </if>
+        <if test="map.agentId != null">
+            and agent_id = #{map.agentId}
+        </if>
+        <if test="map.proId != null">
+            and pro_id = #{map.proId}
+        </if>
+        <if test="map.tenantId != null">
+            and tenant_id = #{map.tenantId}
+        </if>
+        <if test="map.shopId != null">
+            and shop_id = #{map.shopId}
+        </if>
+        <if test="map.orderId != null">
+            and order_id = #{map.orderId}
+        </if>
+        <if test="map.amount != null">
+            and amount = #{map.amount}
+        </if>
+        <if test="map.secAmount != null">
+            and sec_amount = #{map.secAmount}
+        </if>
+        <if test="map.orderAmount != null">
+            and order_amount = #{map.orderAmount}
+        </if>
+        <if test="map.type != null">
+            and type = #{map.type}
+        </if>
+        <if test="map.status != null">
+            and status = #{map.status}
+        </if>
+        <if test="map.cityCode != null">
+            and city_code = #{map.cityCode}
+        </if>
+        <if test="map.remark != null">
+            and remark = #{map.remark}
+        </if>
+        <if test="map.createTime != null">
+            and create_time = #{map.createTime}
+        </if>
+        <if test="map.updateTime != null">
+            and update_time = #{map.updateTime}
+        </if>
+    </sql>
+
+
+    <select id="selectByMapEx" parameterType="Map" resultMap="BaseResultMap">
+        select
+        <choose>
+            <when test="map.fields != null">
+                ${fields}
+            </when>
+            <otherwise>
+                <include refid="Base_Column_List" />
+            </otherwise>
+        </choose>
+        from user_royal_flow_pro
+        <where>
+            <include refid="base_where" />
+
+            <if test="map.startTime != null">
+                and create_time &gt;= #{map.startTime}
+            </if>
+            <if test="map.endTime != null">
+                and create_time &lt;= #{map.endTime}
+            </if>
+            <if test="map.isPay != null">
+                and status != 0
+            </if>
+        </where>
+        <if test="map.orderBy != null">
+            order by ${param.orderBy}
+        </if>
+    </select>
+    <select id="selectFlowWithAllByMap" resultType="com.turing.code.user.pojo.vo.UserRoyalFlowVO">
+        SELECT * from (
+        <if test="map.map.businessType == null or map.businessType == 1">
+            (SELECT
+            f.id, f.audit_id as order_id, f.amount AS sec_amount, f.push_type, f.create_time, f.order_amount,
+            u.nick, u.avatar, f.source_type as query_type,
+            CASE f.audit_id WHEN f.order_id THEN 1 ELSE 2 END as type,
+            null as city_name, null as name, f.source_id
+            FROM
+            user_royal_flow AS f
+            LEFT JOIN user_info AS u ON u.id = f.user_id
+            where !ISNULL(f.push_type) and f.user_id = #{map.map.userId}
+            )
+
+            UNION ALL
+
+            (SELECT
+            a.id, null as order_id, a.money AS sec_amount,
+            CASE a.push_type WHEN 2 THEN (CASE a.us_id WHEN #{map.map.userId} THEN 1 ELSE 2 END) ELSE 1 END as push_type,
+            a.create_time, a.money AS order_amount, u.nick,u.avatar,
+            CASE a.type WHEN 1 THEN 2 ELSE 1 END as query_type,
+            a.status as type, a.city_name, a.name, null as source_id
+            FROM
+            user_promoter_audit AS a
+            LEFT JOIN user_info AS u ON u.id = a.us_id
+            where
+            a.status != 1
+            and a.open_type = 2
+            and (a.agent_id = #{map.map.userId} or a.us_id = #{map.map.userId})
+            )
+            <!-- 单独加上查询开通六度人脉vip的逻辑start -->
+            UNION ALL
+            (SELECT
+            f.id, f.order_id, f.sec_amount, f.type as push_type, f.create_time, f.order_amount,
+            u.nick, u.avatar, 4 as query_type, CASE f.status WHEN 1 THEN 2 ELSE 1 END type, null as city_name, null as name, null as source_id
+            FROM
+            user_royal_flow_pro AS f
+            LEFT JOIN user_info AS u ON u.id = f.user_id
+            WHERE f.agent_id = #{map.map.userId} and (f.status = 1 or f.status = 2)
+            and ISNULL(f.order_id)
+            )
+            <!-- end -->
+        </if>
+        <if test="map.businessType == null">
+            UNION ALL
+        </if>
+        <if test="map.businessType == null or businessType == 2">
+            (SELECT
+            f.id, f.order_id, f.sec_amount, f.type as push_type, f.create_time, f.order_amount,
+            u.nick, u.avatar, 4 as query_type, CASE f.status WHEN 1 THEN 2 ELSE 1 END type, null as city_name, null as name, null as source_id
+            FROM
+            user_royal_flow_pro AS f
+            LEFT JOIN user_info AS u ON u.id = f.user_id
+            WHERE f.agent_id = #{map.map.userId} and
+            <!-- 添加orderid不为Null的筛选，把开通六度人脉vip的记录排除掉 -->
+            !ISNULL(f.order_id) and
+            <!-- end -->
+            (f.status = 1 or f.status = 2)
+            )
+        </if>
+        ) a
+        <where>
+            <if test="map.map.type != null">
+                and type = #{map.map.type}
+            </if>
+            <if test="map.map.pushType != null">
+                and push_type = #{map.map.pushType}
+            </if>
+        </where>
+        <if test="map.map.orderBy != null">
+            order by ${map.orderBy}
+        </if>
+    </select>
+    <select id="selectFlowProWithAllByMap" resultType="com.turing.code.tenant.pojo.vo.UserRoyalFlowProVO">
+        (
+        SELECT
+        f.id,f.order_id,f.sec_amount,f.type,f.create_time,f.order_amount,f.status,
+        u.nick,u.avatar,m.grade,1 as query_type,0 as source_type,
+        (CASE m.grade WHEN 0 THEN mc.user_direct WHEN 1 THEN mc.gold_direct WHEN 2 THEN mc.partner_direct WHEN 3 THEN mc.super_partner_direct END) power,
+        (CASE m.grade WHEN 0 THEN mc.user_indirect WHEN 1 THEN mc.gold_indirect WHEN 2 THEN mc.partner_indirect WHEN 3 THEN mc.super_partner_indirect END) in_power,
+        (CASE m.grade WHEN 0 THEN mc.gold_team WHEN 1 THEN mc.partner_team WHEN 2 THEN mc.super_partner_team WHEN 3 THEN NULL END) up_grade_team,
+        (CASE m.grade WHEN 0 THEN mc.gold_person WHEN 1 THEN mc.partner_person WHEN 2 THEN mc.super_partner_person WHEN 3 THEN NULL END) up_grade_person
+        FROM
+        user_royal_flow_pro AS f
+        LEFT JOIN user_info AS u ON u.id = f.agent_id
+        inner JOIN tenant_invite AS m ON m.user_id = f.agent_id and m.tenant_id = f.tenant_id
+        LEFT JOIN tenant_invite_config mc ON mc.tenant_id = f.tenant_id
+        WHERE f.status != 0
+        <if test="map.type != null">
+            and f.type = #{map.type}
+        </if>
+        <if test="map.orderId != null">
+            and f.order_id = #{map.orderId}
+        </if>
+        <if test="map.startTime != null">
+            and f.create_time &gt;= #{map.startTime}
+        </if>
+        <if test="map.endTime != null">
+            and f.create_time &lt;= #{map.endTime}
+        </if>
+        <if test="map.status != null">
+            and f.status = #{map.status}
+        </if>
+        <if test="map.cityCode != null">
+            and f.city_code = #{map.cityCode}
+        </if>
+        )
+        union all
+        (
+        SELECT
+        f.id,f.order_id,f.sec_amount AS sec_amount,f.type as type,f.create_time,f.order_amount,
+        2 as status,
+        u.nick,u.avatar,u.level as grade,2 as query_type,14 as source_type,
+        0 as power,0 as in_power,0 as up_grade_team,0 as up_grade_person
+        FROM
+        user_royal_flow_pro AS f
+        LEFT JOIN user_info AS u ON u.id = f.agent_id
+        where
+        <!-- 加上这行order_id等于null的，可筛选出推广vip的数据，因为添加推广vip流水的时候，orderid为空，添加普通订单流水的时候，传了订单id，注意后面如果要往user_royal表加其他流水，要区分出来，或者直接用其他的表 -->
+        ISNULL( f.order_id ) and
+        <!-- end -->
+        !ISNULL(f.type)
+        <if test="map.type != null">
+            and f.type = #{map.type}
+        </if>
+        <if test="map.startTime != null">
+            and f.create_time &gt;= #{map.startTime}
+        </if>
+        <if test="map.orderId != null">
+            and f.order_id = #{map.orderId}
+        </if>
+        <if test="map.endTime != null">
+            and f.create_time &lt;= #{map.endTime}
+        </if>
+        <if test="map.cityCode != null">
+            and f.city_code = #{map.cityCode}
+        </if>
+        )
+        <if test="map.status == null or map.status == 2">
+            union all
+            (
+            SELECT
+            f.id,f.order_id,f.amount AS sec_amount,f.push_type as type,f.create_time,f.order_amount,
+            2 as status,
+            u.nick,u.avatar,u.level as grade,2 as query_type,f.source_type,
+            0 as power,0 as in_power,0 as up_grade_team,0 as up_grade_person
+            FROM
+            user_royal_flow AS f
+            LEFT JOIN user_info AS u ON u.id = f.user_id
+            where !ISNULL(f.push_type)
+            <if test="map.type != null">
+                and f.push_type = #{map.type}
+            </if>
+            <if test="map.startTime != null">
+                and f.create_time &gt;= #{map.startTime}
+            </if>
+            <if test="map.orderId != null">
+                and f.order_id = #{map.orderId}
+            </if>
+            <if test="map.endTime != null">
+                and f.create_time &lt;= #{map.endTime}
+            </if>
+            <if test="map.cityCode != null">
+                and f.city_code = #{map.cityCode}
+            </if>
+            )
+        </if>
+        order by create_time desc
+    </select>
+
+</mapper>

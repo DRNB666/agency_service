@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.turing.code.user.mapper.UserVipLevelMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.turing.code.user.pojo.UserVipLevel" autoMapping="true">
+        <id column="id" property="id" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, status, remark, create_time, update_time, test_time, version, us_id, vip_level_id, due_time
+    </sql>
+    <select id="highestDiscount" resultType="java.math.BigDecimal">
+        SELECT
+        tvl.discount_ratio
+        FROM
+        user_vip_level uvl
+        LEFT JOIN tenant_vip_level tvl ON uvl.vip_level_id = tvl.id
+        WHERE
+        uvl.`status` = 1
+        AND uvl.us_id = #{param.usId}
+        AND uvl.tenant_id = #{param.infoId}
+        ORDER BY
+        tvl.discount_ratio ASC
+        LIMIT 1
+    </select>
+
+</mapper>
