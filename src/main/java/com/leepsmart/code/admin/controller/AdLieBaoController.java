@@ -61,6 +61,7 @@ public class AdLieBaoController {
     @ApiOperation("同步账户列表")
     @PostMapping("syncAccountList")
     public String syncAccountList(Integer agentType) {
+        //
         String accounts = lieBaoService.fbAccountList();
         JSONArray accountArray = JSONArray.parseArray(accounts);
         List<SysLieBaoAccount> sysLieBaoAccounts = new ArrayList<>();
