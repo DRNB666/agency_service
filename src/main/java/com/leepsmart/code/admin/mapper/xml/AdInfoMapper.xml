@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.leepsmart.code.admin.mapper.AdInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.leepsmart.code.admin.pojo.AdInfo" autoMapping="true">
+        <id column="id" property="id"/>
+    </resultMap>
+
+    <select id="selectAndRole" resultType="com.leepsmart.code.admin.pojo.vo.AdInfoVO">
+        select
+        ${ew.SqlSelect}
+        from ad_info
+        inner join ad_role
+        on ad_info.role_id = ad_role.id
+        <where>
+            ${ew.sqlSegment}
+        </where>
+    </select>
+
+</mapper>

@@ -3,10 +3,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.turing</groupId>
-    <artifactId>base_service</artifactId>
+    <groupId>com.leepsmart</groupId>
+    <artifactId>leepsmartAgency_service</artifactId>
     <version>1.2.8</version>
-    <name>keying_service</name>
+    <name>leepsmartAgency_service</name>
     <packaging>jar</packaging>
     <description>单体基础架构</description>
 
@@ -112,9 +112,12 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-            <version>1.2.37</version>
+            <version>2.0.46</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
         <!--springFox swagger官方Starter-->
         <dependency>
             <groupId>io.springfox</groupId>
@@ -191,7 +194,7 @@
         <dependency>
             <groupId>com.github.binarywang</groupId>
             <artifactId>wx-java-miniapp-spring-boot-starter</artifactId>
-<!--            <version>${wx-java.version}</version>-->
+            <!--            <version>${wx-java.version}</version>-->
             <version>4.5.0</version>
         </dependency>
         <!-- quartz动态定时器 -->
@@ -246,37 +249,37 @@
     <build>
         <plugins>
             <!--  源码打包start -->
+            <!--            <plugin>-->
+            <!--                <groupId>org.springframework.boot</groupId>-->
+            <!--                <artifactId>spring-boot-maven-plugin</artifactId>-->
+            <!--                <configuration>-->
+            <!--                    &lt;!&ndash;这里对应项目的主入口&ndash;&gt;-->
+            <!--                    <mainClass>com.leepsmart.code.Application</mainClass>-->
+            <!--                    <layout>ZIP</layout>-->
+            <!--                    <includes>-->
+            <!--                        <include>-->
+            <!--                            <groupId>nothing</groupId>-->
+            <!--                            <artifactId>nothing</artifactId>-->
+            <!--                        </include>-->
+            <!--                    </includes>-->
+            <!--                </configuration>-->
+            <!--                <executions>-->
+            <!--                    <execution>-->
+            <!--                        <goals>-->
+            <!--                            <goal>repackage</goal>-->
+            <!--                        </goals>-->
+            <!--                    </execution>-->
+            <!--                </executions>-->
+            <!--            </plugin>-->
+            <!--  源码打包end -->
+            <!--  全依赖打包start -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <!--这里对应项目的主入口-->
-                    <mainClass>com.turing.code.Application</mainClass>
-                    <layout>ZIP</layout>
-                    <includes>
-                        <include>
-                            <groupId>nothing</groupId>
-                            <artifactId>nothing</artifactId>
-                        </include>
-                    </includes>
+                    <mainClass>com.leepsmart.code.Application</mainClass>
                 </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
-            <!--  源码打包end -->
-            <!--  全依赖打包start -->
-<!--                        <plugin>-->
-<!--                            <groupId>org.springframework.boot</groupId>-->
-<!--                            <artifactId>spring-boot-maven-plugin</artifactId>-->
-<!--                            <configuration>-->
-<!--                                <mainClass>Application</mainClass>-->
-<!--                            </configuration>-->
-<!--                        </plugin>-->
             <!--  全依赖打包end -->
         </plugins>
 
@@ -307,7 +310,7 @@
             </resource>
         </resources>
 
-        <finalName>keying_service</finalName>
+        <finalName>leepsmartAgency_service</finalName>
     </build>
 
 </project>

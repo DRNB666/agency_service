@@ -1,10 +1,10 @@
 server:
-  port: 8080
+  port: 8000
   tomcat:
     max-http-post-size: 100MB  #请求参数长度
     max-http-form-post-size: 100MB #form表单长度
 
-logging.level.com.turing.code: debug
+logging.level.com.leepsmart.code: debug
 # 文件保存地址
 upLoadDir: C:/Users/13658/Desktop/nginx-1.26.1/files/
 # 微信支付回调地址
@@ -17,9 +17,9 @@ spring:
   datasource:
     druid:
       driver-class-name: com.mysql.jdbc.Driver
-      url: jdbc:mysql://127.0.0.1:3306/keying?useUnicode=true&characterEncoding=utf8&useSSL=false&allowMultiQueries=true&serverTimezone=GMT%2B8
+      url: jdbc:mysql://127.0.0.1:3306/LEEPSMART.AGENCY?useUnicode=true&characterEncoding=utf8&useSSL=false&allowMultiQueries=true&serverTimezone=GMT%2B8
       username: root
-      password: 123456
+      password: root
 
   servlet:
     multipart:
@@ -39,6 +39,26 @@ spring:
   mvc:
     static-path-pattern: /static/**
 
+  #邮箱配置
+  mail:
+    host: smtp.exmail.qq.com
+    port: 465
+    username: business@leepsmart.com
+    password: 7rQzCqY3owXAsTf6
+    default-encoding: UTF-8
+    properties:
+      mail:
+        debug: true
+        smtp:
+          socketFactory:
+            class: javax.net.ssl.SSLSocketFactory
+
+#猎豹api
+lieBao:
+  appId: D6lVRPk
+  secret: f38d64ad-0d0b-4e94-8c5f-27a9e014bf87
+  prefix: https://test-open-api.neverbugs.com
+
 # 是否生成swagger文档
 springfox:
   documentation:
@@ -47,12 +67,12 @@ springfox:
 #apifox配置
 ApiFox:
   enabled: true
-  projectId: 4703589
-  Authorization: APS-zOsmuK9aZgYXXyFlOjvs3nPYPwq3qpe6
+  projectId: 4840455
+  Authorization: APS-qXhqssYLbQIVyqKsK6amtyGmTZjzepQp
 
 # mybatis-plus 相关配置
 mybatis-plus:
-  mapper-locations: classpath:com/turing/**/mapper/xml/*.xml
+  mapper-locations: classpath:com/leepsmart/**/mapper/xml/*.xml
   global-config:
     banner: false
     db-config:
@@ -67,15 +87,6 @@ mybatis-plus:
     field-id: tenant_id
     # 过滤不需要租户隔离的表
     ignore-tables:
-      - tenant_info
-      - sys_db_backup
-      - ad_info
-      - ad_menu
-      - ad_profit
-      - ad_role
-      - ad_role_menu
-      - sys_timer_config
-      - sys_params
 
 #阿里短信参数配置
 ali:

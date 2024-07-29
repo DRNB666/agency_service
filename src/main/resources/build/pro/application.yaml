@@ -1,12 +1,12 @@
 server:
-  port: 8080
+  port: 8110
   tomcat:
     max-http-post-size: 100MB  #请求参数长度
     max-http-form-post-size: 100MB #form表单长度
 
-logging.level.com.turing.code: debug
+logging.level.com.leepsmart.code: debug
 # 文件保存地址
-upLoadDir: /www/wwwroot/keying/files
+upLoadDir: C:/Users/13658/Desktop/nginx-1.26.1/files/
 # 微信支付回调地址
 callBack: 127.0.0.1
 spring:
@@ -17,13 +17,15 @@ spring:
   datasource:
     druid:
       driver-class-name: com.mysql.jdbc.Driver
-      url: jdbc:mysql://127.0.0.1:3306/keying?useUnicode=true&characterEncoding=utf8&useSSL=false&allowMultiQueries=true&serverTimezone=GMT%2B8
-      username: keying
-      password: hxbLAcPdFZJwfnG3
+      url: jdbc:mysql://127.0.0.1:3307/LEEPSMART.AGENCY?useUnicode=true&characterEncoding=utf8&useSSL=false&allowMultiQueries=true&serverTimezone=GMT%2B8
+      username: root
+      password: S9vwsvUysZ
 
   servlet:
     multipart:
+      # 文件上传大小限制
       max-file-size: 500MB
+      # 请求大小限制
       max-request-size: 500MB
   # springboot启动banner
   banner:
@@ -37,13 +39,25 @@ spring:
   mvc:
     static-path-pattern: /static/**
 
+  #邮箱配置
+  mail:
+    host: smtp.exmail.qq.com
+    port: 465
+    username: business@leepsmart.com
+    password: 7rQzCqY3owXAsTf6
+    default-encoding: UTF-8
+    properties:
+      mail:
+        debug: true
+        smtp:
+          socketFactory:
+            class: javax.net.ssl.SSLSocketFactory
 
-# 数据库备份相关配置
-backup:
-  mysql:
-    ip: 192.168.0.127
-    host: 3306
-    database: base_db
+#猎豹api
+lieBao:
+  appId: 76DVdDk
+  secret: 418f72fe-2b1e-4779-91a0-0974bdd5c842
+  prefix: https://open-api.cmcm.com/
 
 # 是否生成swagger文档
 springfox:
@@ -52,13 +66,13 @@ springfox:
 
 #apifox配置
 ApiFox:
-  enabled: false
-  projectId: 4346627
-  Authorization: APS-zOsmuK9aZgYXXyFlOjvs3nPYPwq3qpe6
+  enabled: true
+  projectId: 4840455
+  Authorization: APS-qXhqssYLbQIVyqKsK6amtyGmTZjzepQp
 
 # mybatis-plus 相关配置
 mybatis-plus:
-  mapper-locations: classpath:com/turing/**/mapper/xml/*.xml
+  mapper-locations: classpath:com/leepsmart/**/mapper/xml/*.xml
   global-config:
     banner: false
     db-config:
@@ -73,15 +87,7 @@ mybatis-plus:
     field-id: tenant_id
     # 过滤不需要租户隔离的表
     ignore-tables:
-      - tenant_info
-      - sys_db_backup
-      - ad_info
-      - ad_menu
-      - ad_profit
-      - ad_role
-      - ad_role_menu
-      - sys_timer_config
-      - sys_params
+
 #阿里短信参数配置
 ali:
   sms:
@@ -130,7 +136,7 @@ wx:
   # 微信支付相关配置（示例）
   pay:
     # 微信公众号或者小程序等的appid
-    appId: wx5d64b4efc5076c1f
+    appId: xxx
     # 微信支付商户号
     mchId: xxx
     # 微信支付商户密钥
@@ -140,6 +146,7 @@ wx:
   # 小程序相关配置
   miniapp:
     # 微信小程序的appid
+    #    appId: wx5d64b4efc5076c1f
     appId: wx5d64b4efc5076c1f
     # 微信小程序的Secret
     secret: a394c039315d8aedab8781b9957ae2dd

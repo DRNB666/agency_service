@@ -9,7 +9,7 @@
 	<id>base_service</id>
 
 	<classpath>
-		<dir name="D:/java_soft/project/keying_service/target/classes">
+		<dir name="/Users/li/Desktop/Leon/base_service/leepsmartAgency_service/target/classes">
 		</dir>
 	</classpath>
 
