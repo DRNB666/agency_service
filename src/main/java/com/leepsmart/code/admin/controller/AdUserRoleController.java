@@ -1,58 +1,60 @@
 package com.leepsmart.code.admin.controller;
 
-import com.leepsmart.code.admin.pojo.AdInfo;
-import com.leepsmart.code.admin.pojo.AdMenu;
-import com.leepsmart.code.admin.pojo.AdRole;
-import com.leepsmart.code.admin.pojo.AdRoleMenu;
-import com.leepsmart.code.admin.service.AdRoleMenuService;
-import com.leepsmart.code.admin.service.AdRoleService;
 import com.leepsmart.code.admin.tools.enums.AdMenuFlag;
 import com.leepsmart.code.admin.tools.enums.AdRoleStatus;
-import com.leepsmart.code.common.annotation.parameterverify.ParameterVerify;
 import com.leepsmart.code.common.annotation.repeat.PreventRepeat;
-import com.leepsmart.code.common.utils.CommUtil;
-import com.leepsmart.code.common.utils.page.pojo.PageInfo;
-import com.leepsmart.code.common.utils.page.pojo.PageResult;
-import com.leepsmart.code.common.utils.page.util.PageUtil;
-import com.leepsmart.code.common.utils.returnbody.ResultCodeInfo;
-import com.leepsmart.code.common.utils.returnbody.ReturnBody;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.PostMapping;
+import com.leepsmart.code.user.pojo.UserMenu;
+import com.leepsmart.code.user.pojo.UserRoleMenu;
+import com.leepsmart.code.user.service.UserRoleMenuService;
+import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import javax.annotation.Resource;
+import com.leepsmart.code.user.service.UserRoleService;
+import com.leepsmart.code.user.pojo.UserRole;
 import javax.servlet.http.HttpServletRequest;
+import com.leepsmart.code.common.utils.returnbody.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import com.leepsmart.code.common.annotation.parameterverify.ParameterVerify;
+import com.leepsmart.code.common.utils.page.pojo.PageResult;
+import com.leepsmart.code.common.utils.page.pojo.PageInfo;
+import com.leepsmart.code.common.utils.page.util.PageUtil;
+import com.leepsmart.code.common.utils.CommUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * @author leepsmart generator
+ * @since 2024-07-30
  */
-@Api(tags = "后台-角色")
+@Api(tags = "后台-用户角色")
+@ApiResponses({
+    @ApiResponse(code = 200, message = "请求成功"),
+    @ApiResponse(code = 401, message = "无用户权限"),
+    @ApiResponse(code = 403, message = "无资源权限"),
+    @ApiResponse(code = 404, message = "找不到接口"),
+})
 @RestController
-@RequestMapping("admin/adRole")
-public class AdRoleController {
+@RequestMapping(value = "admin/userRole", produces = "text/plain;charset=utf-8")
+public class AdUserRoleController {
 
     @Resource
     private HttpServletRequest request;
     @Resource
-    private AdRoleService adRoleService;
+    private UserRoleService userRoleService;
     @Resource
-    private AdRoleMenuService adRoleMenuService;
-
+    private UserRoleMenuService adUserRoleMenuService;
+    
     @ApiOperation("角色列表")
     @ApiImplicitParam(paramType = "query", dataTypeClass = Integer.class, name = "status", value = "角色状态")
     @PostMapping("list")
     public String list(PageInfo pageInfo, Integer status) {
-        pageInfo.setTimeScreen(AdRole.CREATE_TIME);
-        PageResult<AdRole> pageResult = new PageUtil<AdRole>(pageInfo).startPage((page, queryWrapper) -> {
-            queryWrapper.eq(AdRole.STATUS, status);
-            adRoleService.page(page, queryWrapper);
+        pageInfo.setTimeScreen(UserRole.CREATE_TIME);
+        PageResult<UserRole> pageResult = new PageUtil<UserRole>(pageInfo).startPage((page, queryWrapper) -> {
+            queryWrapper.eq(UserRole.STATUS, status);
+            userRoleService.page(page, queryWrapper);
         });
         return ReturnBody.success(pageResult);
     }
@@ -67,11 +69,11 @@ public class AdRoleController {
     @ParameterVerify(notNull = {"roleName"})
     @PreventRepeat
     public String add(String roleName, String remark) {
-        AdRole adRole = new AdRole()
+        UserRole UserRole = new UserRole()
                 .setRoleName(roleName)
                 .setStatus(AdRoleStatus.NORMAL.getValue())
                 .setRemark(remark);
-        if (!adRoleService.save(adRole)) {
+        if (!userRoleService.save(UserRole)) {
             return ReturnBody.error();
         }
         return ReturnBody.success();
@@ -90,11 +92,11 @@ public class AdRoleController {
         if (id == 1) {
             return ReturnBody.error("不可操作管理员角色");
         }
-        AdRole adRole = new AdRole()
+        UserRole UserRole = new UserRole()
                 .setId(id)
                 .setRoleName(roleName)
                 .setRemark(remark);
-        if (!adRoleService.updateById(adRole)) {
+        if (!userRoleService.updateById(UserRole)) {
             return ReturnBody.error();
         }
         return ReturnBody.success();
@@ -115,10 +117,10 @@ public class AdRoleController {
         if (id == 1) {
             return ReturnBody.error("不可操作管理员角色");
         }
-        AdRole adRole = new AdRole()
+        UserRole UserRole = new UserRole()
                 .setStatus(status)
                 .setId(id);
-        if (!adRoleService.updateById(adRole)) {
+        if (!userRoleService.updateById(UserRole)) {
             return ReturnBody.error();
         }
         return ReturnBody.success();
@@ -144,7 +146,7 @@ public class AdRoleController {
 //        if (id != 1) {
 //            return ReturnBody.error("操作该接口的权限不足");
 //        }
-        return adRoleMenuService.setRoleMenu(roleId, menuIds);
+        return adUserRoleMenuService.setRoleMenu(roleId, menuIds);
     }
 
     @ApiOperation("获取该角色拥有的菜单权限")
@@ -154,9 +156,9 @@ public class AdRoleController {
         if (!CommUtil.checkNull(roleId)) {
             return ReturnBody.error(ResultCodeInfo.PARAM_ERROR);
         }
-        AdRoleMenu adminRoleMenu = new AdRoleMenu();
-        adminRoleMenu.setRoleId(roleId);
-        List<AdMenu> list = adRoleMenuService.selectRoleMenu(adminRoleMenu);
+        UserRoleMenu UserRoleMenu = new UserRoleMenu();
+        UserRoleMenu.setRoleId(roleId);
+        List<UserMenu> list = adUserRoleMenuService.selectRoleMenu(UserRoleMenu);
         List<Integer> integers = new ArrayList<>();
         list.stream()
                 .filter(item -> item.getFlag().equals(AdMenuFlag.INTERFACE.getValue()))
@@ -164,6 +166,9 @@ public class AdRoleController {
                 .forEach(item -> integers.add(item.getId()));
         return ReturnBody.success(integers);
     }
+
+
+
 
 
 }

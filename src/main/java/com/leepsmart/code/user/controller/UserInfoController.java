@@ -23,6 +23,7 @@ import com.leepsmart.code.common.utils.encrypt.RSAUtil;
 
 import com.leepsmart.code.common.utils.returnbody.Code;
 
+import com.leepsmart.code.common.utils.returnbody.ResultCodeInfo;
 import com.leepsmart.code.common.utils.returnbody.ReturnBody;
 
 import com.leepsmart.code.system.service.SysParamsService;
@@ -66,8 +67,6 @@ public class UserInfoController {
     private HttpServletRequest request;
     @Resource
     private UserInfoService userInfoService;
-    @Resource
-    private UserInfoMapper userInfoMapper;
     @Resource
     private SysParamsService sysParamsService;
     @Resource
@@ -150,6 +149,22 @@ public class UserInfoController {
     public String getLieBaoAc(){
         String result = lieBaoService.lieBaoAccessToken();
         return ReturnBody.success(result);
+    }
+
+    @ApiOperation("注销")
+    @PostMapping("logout")
+    public String logout(){
+        Long rId = (Long) request.getAttribute("id");
+        UserInfo userInfo = userInfoService.getById(rId);
+        if (!CommUtil.checkNull(userInfo)){
+            return ReturnBody.error(ResultCodeInfo.PARAM_ERROR);
+        }
+        //下线
+        userInfo.setLoginStatus(0);
+        if (!userInfoService.updateById(userInfo)) {
+            return ReturnBody.error(ResultCodeInfo.SERVICE_EXCEPTION);
+        }
+        return ReturnBody.success();
     }
     
 

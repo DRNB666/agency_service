@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 /**
  * @author leepsmart generator
- * @since 2024-07-24
+ * @since 2024-07-30
  */
 @ApiModel(value="UserInfo对象", description="用户信息")
 public class UserInfo implements Serializable {
@@ -79,6 +79,27 @@ public class UserInfo implements Serializable {
 
     @ApiModelProperty(value = "邮箱（注册账号时必填）")
     private String email;
+
+    @ApiModelProperty(value = "猎豹钱包")
+    private BigDecimal lieBaoAmount;
+
+    @ApiModelProperty(value = "飞书钱包")
+    private BigDecimal sinoclickAmount;
+
+    @ApiModelProperty(value = "维卓钱包")
+    private BigDecimal wezoAmount;
+
+    @ApiModelProperty(value = "登录态 1:在线 0:下线")
+    private Integer loginStatus;
+
+    @ApiModelProperty(value = "注册ip")
+    private String registerIp;
+
+    @ApiModelProperty(value = "登录ip")
+    private String loginIp;
+
+    @ApiModelProperty(value = "角色id")
+    private Integer roleId;
 
     public Long getId() {
         return id;
@@ -240,6 +261,62 @@ public class UserInfo implements Serializable {
         this.email = email;
         return this;
     }
+    public BigDecimal getLieBaoAmount() {
+        return lieBaoAmount;
+    }
+
+    public UserInfo setLieBaoAmount(BigDecimal lieBaoAmount) {
+        this.lieBaoAmount = lieBaoAmount;
+        return this;
+    }
+    public BigDecimal getSinoclickAmount() {
+        return sinoclickAmount;
+    }
+
+    public UserInfo setSinoclickAmount(BigDecimal sinoclickAmount) {
+        this.sinoclickAmount = sinoclickAmount;
+        return this;
+    }
+    public BigDecimal getWezoAmount() {
+        return wezoAmount;
+    }
+
+    public UserInfo setWezoAmount(BigDecimal wezoAmount) {
+        this.wezoAmount = wezoAmount;
+        return this;
+    }
+    public Integer getLoginStatus() {
+        return loginStatus;
+    }
+
+    public UserInfo setLoginStatus(Integer loginStatus) {
+        this.loginStatus = loginStatus;
+        return this;
+    }
+    public String getRegisterIp() {
+        return registerIp;
+    }
+
+    public UserInfo setRegisterIp(String registerIp) {
+        this.registerIp = registerIp;
+        return this;
+    }
+    public String getLoginIp() {
+        return loginIp;
+    }
+
+    public UserInfo setLoginIp(String loginIp) {
+        this.loginIp = loginIp;
+        return this;
+    }
+    public Integer getRoleId() {
+        return roleId;
+    }
+
+    public UserInfo setRoleId(Integer roleId) {
+        this.roleId = roleId;
+        return this;
+    }
 
     public static final String ID = "user_info.id";
     public static final String OPEN_ID = "user_info.open_id";
@@ -261,6 +338,13 @@ public class UserInfo implements Serializable {
     public static final String UPDATE_TIME = "user_info.update_time";
     public static final String CREATE_TIME = "user_info.create_time";
     public static final String EMAIL = "user_info.email";
+    public static final String LIE_BAO_AMOUNT = "user_info.lie_bao_amount";
+    public static final String SINOCLICK_AMOUNT = "user_info.sinoclick_amount";
+    public static final String WEZO_AMOUNT = "user_info.wezo_amount";
+    public static final String LOGIN_STATUS = "user_info.login_status";
+    public static final String REGISTER_IP = "user_info.register_ip";
+    public static final String LOGIN_IP = "user_info.login_ip";
+    public static final String ROLE_ID = "user_info.role_id";
 
 
     @Override
@@ -286,6 +370,13 @@ public class UserInfo implements Serializable {
             ", updateTime=" + updateTime +
             ", createTime=" + createTime +
             ", email=" + email +
+            ", lieBaoAmount=" + lieBaoAmount +
+            ", sinoclickAmount=" + sinoclickAmount +
+            ", wezoAmount=" + wezoAmount +
+            ", loginStatus=" + loginStatus +
+            ", registerIp=" + registerIp +
+            ", loginIp=" + loginIp +
+            ", roleId=" + roleId +
         "}";
     }
 
@@ -311,6 +402,13 @@ public class UserInfo implements Serializable {
             ,UserInfo.UPDATE_TIME
             ,UserInfo.CREATE_TIME
             ,UserInfo.EMAIL
+            ,UserInfo.LIE_BAO_AMOUNT
+            ,UserInfo.SINOCLICK_AMOUNT
+            ,UserInfo.WEZO_AMOUNT
+            ,UserInfo.LOGIN_STATUS
+            ,UserInfo.REGISTER_IP
+            ,UserInfo.LOGIN_IP
+            ,UserInfo.ROLE_ID
         ));
         list.removeAll(new ArrayList<>(Arrays.asList(noField)));
         return list.toArray(new String[0]);

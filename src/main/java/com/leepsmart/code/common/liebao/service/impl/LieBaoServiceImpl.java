@@ -214,7 +214,7 @@ public class LieBaoServiceImpl implements LieBaoService {
             headers.set("Authorization", lieBaoAccessToken());
             HttpEntity<?> entity = new HttpEntity<>(headers);
 
-            ResponseEntity<String> responseEntity = restTemplate.exchange(builder.toUriString(), HttpMethod.GET, entity, String.class);
+            ResponseEntity<String> responseEntity = restTemplate.exchange(builder.toUriString(), HttpMethod.POST, entity, String.class);
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
                 LogUtil.info("猎豹接口请求:{},返回的请求信息:{}", url, responseEntity.getBody());
                 JSONArray res = JSONObject.parseObject(responseEntity.getBody()).getJSONArray("data");
@@ -225,5 +225,29 @@ public class LieBaoServiceImpl implements LieBaoService {
             throw new ServiceException();
         }
         return result;
+    }
+
+    @Override
+    public boolean facebookAccountReset(String accountId) {
+        String url = prefix + LieBaoApi.FACEBOOK_ACCOUNT_RESET.getUrl();
+        try {
+            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url)
+                    .queryParam("account_id", accountId);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", lieBaoAccessToken());
+            HttpEntity<?> entity = new HttpEntity<>(headers);
+
+            ResponseEntity<String> responseEntity = restTemplate.exchange(builder.toUriString(), HttpMethod.POST, entity, String.class);
+            if (responseEntity.getStatusCode().is2xxSuccessful()) {
+                LogUtil.info("猎豹接口请求:{},返回的请求信息:{}", url, responseEntity.getBody());
+                String res = JSONObject.parseObject(responseEntity.getBody()).getString("msg");
+                return res.equals("成功");
+            }
+        } catch (Exception e) {
+            LogUtil.error("猎豹接口请求失败:{},错误原因:{}", url, e);
+            throw new ServiceException();
+        }
+        return false;
     }
 }

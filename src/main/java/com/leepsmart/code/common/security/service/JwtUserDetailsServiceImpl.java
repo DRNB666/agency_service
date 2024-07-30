@@ -48,11 +48,12 @@ public class JwtUserDetailsServiceImpl implements UserDetailsService {
                 throw new UsernameNotFoundException(String.format("'%s' invalid", username));
             } else if (-1 == user.getStatus()) {
                 throw new LockedException("账户已被冻结");
+            }else if(user.getLoginStatus()!=1){
+                throw new LockedException("账户状态异常");
             }
-            request.setAttribute("info", user);
             request.setAttribute("id", user.getId());
+            request.setAttribute("role", user.getRoleId());
             return new JwtUser(username,user.getPassword(), AuthorityUtils.commaSeparatedStringToAuthorityList(SecurityConfig.ROLE_USER));
-
         } else if (username.endsWith(SecurityConfig.ROLE_ADMIN)) {
             QueryWrapper<AdInfo> queryWrapper = new CustomQueryWrapper<AdInfo>()
                     .eq(AdInfo.ACCOUNT, username.replace(SecurityConfig.ROLE_ADMIN, ""));
@@ -60,8 +61,8 @@ public class JwtUserDetailsServiceImpl implements UserDetailsService {
             if (user == null) {
                 throw new UsernameNotFoundException(String.format("'%s' invalid", username));
             } else {
-                request.setAttribute(AdInfo.ID, user.getId());
-                request.setAttribute(AdInfo.ROLE_ID, user.getRoleId());
+                request.setAttribute("adId", user.getId());
+                request.setAttribute("adRoleId", user.getRoleId());
                 return new JwtUser(username, user.getPassword(), AuthorityUtils.commaSeparatedStringToAuthorityList(SecurityConfig.ROLE_ADMIN));
             }
         } else {

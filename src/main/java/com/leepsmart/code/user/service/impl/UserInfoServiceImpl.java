@@ -52,25 +52,34 @@ public class UserInfoServiceImpl extends CommonServiceImpl<UserInfoMapper, UserI
 
     @Override
     public JSONObject registerOrLogin(String email) {
+        JSONObject detail = new JSONObject();
         JSONObject result = new JSONObject();
         //判断是否是新用户
         QueryWrapper<UserInfo> eq = new QueryWrapper<>();
         eq.eq(UserInfo.EMAIL, email);
         UserInfo userInfo = getOne(eq);
-        if (CommUtil.checkNull(userInfo)){
+        if (CommUtil.checkNull(userInfo)) {
             //获取token
             getToken(userInfo.getAccount(), result, userInfo);
-        }else {
-            String account="";
-            UserInfo newUser = new UserInfo().setEmail(email).setLoginTime(new Date())
+            //设置登录态
+            userInfo.setLoginStatus(1);
+            if (!updateById(userInfo)) {
+                throw new ServiceException();
+            }
+
+            detail.put("name",CommUtil.checkNull(userInfo.getName())?userInfo.getName():"未设置");
+            detail.put("email",CommUtil.checkNull(userInfo.getEmail())?userInfo.getEmail():"未设置");
+        } else {
+            String account = "";
+            UserInfo newUser = new UserInfo().setEmail(email).setLoginTime(new Date()).setLoginStatus(1)
                     .setPassword((encoder.encode("123456" + KeyConfig.KEY_PWD))).setUpdateTime(new Date());
-            while (true){
-                String pre="AGENCY-";
+            while (true) {
+                String pre = "AGENCY-";
                 String acNumber = CommUtil.createRandom(false, 6);
-                account=pre+acNumber;
+                account = pre + acNumber;
                 QueryWrapper<UserInfo> accountUserEq = new QueryWrapper<UserInfo>().eq(UserInfo.ACCOUNT, account);
                 UserInfo rawUser = getOne(accountUserEq);
-                if (!CommUtil.checkNull(rawUser)){
+                if (!CommUtil.checkNull(rawUser)) {
                     newUser.setAccount(account);
                     break;
                 }
@@ -79,18 +88,26 @@ public class UserInfoServiceImpl extends CommonServiceImpl<UserInfoMapper, UserI
                 throw new ServiceException("注册账号失败");
             }
             getToken(account, result, newUser);
+            detail.put("name",CommUtil.checkNull(userInfo.getName())?userInfo.getName():"未设置");
+            detail.put("email",CommUtil.checkNull(userInfo.getEmail())?userInfo.getEmail():"未设置");
         }
+        result.put("detail",detail);
         return result;
     }
+
     private void getToken(String account, JSONObject result, UserInfo userInfo) {
         UsernamePasswordAuthenticationToken upToken = new UsernamePasswordAuthenticationToken(userInfo.getAccount() + SecurityConfig.ROLE_USER,
-                "123456"+ KeyConfig.KEY_PWD);
+                "123456" + KeyConfig.KEY_PWD);
         Authentication authentication = authenticationManager.authenticate(upToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         UserDetails userDetails = userDetailsService.loadUserByUsername(account + SecurityConfig.ROLE_USER);
         result.put("token", "Bearer_" + JwtTokenUtil.generateToken(userDetails));
         //暂时写死返回
-        result.put("menuList", "[{\"component\":\"\",\"createTime\":\"2019-11-04 16:54:37\",\"flag\":1,\"id\":9,\"menuName\":\"媒体管理\",\"parentId\":-1,\"requestUrl\":\"\",\"sort\":0,\"updateTime\":\"2024-07-25 17:30:31\",\"version\":1},{\"component\":\"Media\",\"createTime\":\"2019-11-04 16:54:37\",\"flag\":1,\"id\":10,\"menuName\":\"媒体管理\",\"parentId\":9,\"requestUrl\":\"/Media\",\"sort\":0,\"updateTime\":\"2024-07-25 17:30:31\",\"version\":1}]");
+        result.put("menuList", "[{\"component\":\"\",\"createTime\":\"2019-11-04 16:54:37\",\"flag\":1,\"id\":9,\"menuName\":\"媒体管理\",\"parentId\":-1,\"requestUrl\":\"/Media\",\"sort\":0," +
+                "\"updateTime\":\"2024-07-25 17:30:31\",\"version\":1}," +
+                "{\"component\":\"\",\"createTime\":\"2019-11-04 16:54:37\",\"flag\":1,\"id\":9,\"menuName\":\"媒体管理\",\"parentId\":10,\"requestUrl\":\"\",\"sort\":0,\"updateTime\":\"2024-07-25 " +
+                "17:30:31\",\"version\":1},{\"component\":\"Media\",\"createTime\":\"2019-11-04 16:54:37\",\"flag\":1,\"id\":10,\"menuName\":\"其它管理\",\"parentId\":-1,\"requestUrl\":\"/Media\"," +
+                "\"sort\":0,\"updateTime\":\"2024-07-25 17:30:31\",\"version\":1}]");
     }
 
 }

@@ -5,6 +5,7 @@ import com.leepsmart.code.common.config.KeyConfig;
 import com.leepsmart.code.common.ex.ServiceException;
 import com.leepsmart.code.common.swagger.apifox.ApiFoxEndpointOverwriteBehavior;
 import com.leepsmart.code.common.swagger.apifox.ApiFoxVersion;
+import org.apache.catalina.connector.Request;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -268,8 +269,6 @@ public class CommUtil {
     }
 
     public static void main(String[] args) {
-        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        System.out.println(bCryptPasswordEncoder.encode("123123" + KeyConfig.KEY_PWD));
     }
 
     public static String generateSignature(String appid, String secret, String timestamp) throws NoSuchAlgorithmException {

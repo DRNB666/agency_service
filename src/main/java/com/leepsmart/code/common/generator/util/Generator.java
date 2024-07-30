@@ -26,7 +26,7 @@ public class Generator {
     /**
      * 模块名
      */
-    private final static String MODEL_NAME = "test";
+    private final static String MODEL_NAME = "user";
     /**
      * 是否生成controller类
      */
@@ -34,7 +34,7 @@ public class Generator {
     /**
      * 表名 (可以同时操作多个, 建议同时操作同一模块下的表)
      */
-    private final static String[] TABLE_NAME = new String[]{"a_base_table"};
+    private final static String[] TABLE_NAME = new String[]{"user_info"};
     /**
      * 主键生成策略
      */

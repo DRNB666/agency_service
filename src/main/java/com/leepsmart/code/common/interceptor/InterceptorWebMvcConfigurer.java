@@ -11,18 +11,19 @@ import javax.annotation.Resource;
 public class InterceptorWebMvcConfigurer implements WebMvcConfigurer {
 
     @Resource
-    private TenantInterceptor tenantInterceptor;
+    private AdminInterceptor adminInterceptor;
+    @Resource
+    private UsInterceptor usInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        /**
-         * 拦截器按照顺序执行
-         *addPathPatterns 用于添加拦截规则
-         *excludePathPatterns 用于排除拦截
-         */
-        registry.addInterceptor(tenantInterceptor)
-                .addPathPatterns("/tenant/**")
-                .excludePathPatterns("/tenant/public/**");
+        registry.addInterceptor(adminInterceptor)
+                .addPathPatterns("/admin/**")
+                .excludePathPatterns("/admin/public/**");
+
+        registry.addInterceptor(usInterceptor)
+                .addPathPatterns("/user/**")
+                .excludePathPatterns("/user/public/**");
 
     }
 }

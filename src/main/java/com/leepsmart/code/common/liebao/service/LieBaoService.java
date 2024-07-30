@@ -42,5 +42,10 @@ public interface LieBaoService {
      */
     String businessAccountBindings(String accountId);
 
+    /**
+     * 账户清零
+     */
+    boolean facebookAccountReset(String accountId);
+
 
 }

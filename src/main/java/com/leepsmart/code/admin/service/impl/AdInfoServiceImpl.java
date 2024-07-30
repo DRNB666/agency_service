@@ -166,7 +166,7 @@ public class AdInfoServiceImpl extends CommonServiceImpl<AdInfoMapper, AdInfo> i
     // 获取该角色拥有权限的菜单
     private List<AdMenu> getRoleMenu() {
         // 获取该角色拥有权限的菜单
-        Integer roleId = (Integer) request.getAttribute(AdInfo.ROLE_ID);
+        Integer roleId = (Integer) request.getAttribute("adRoleId");
         AdRoleMenu adminRoleMenu = new AdRoleMenu();
         List<AdMenu> list;
         if (roleId != 1) {
