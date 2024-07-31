@@ -88,8 +88,9 @@ mybatis-plus:
     # 过滤不需要租户隔离的表
     ignore-tables:
 
-#阿里短信参数配置
+#阿里相关配置
 ali:
+  #短信
   sms:
     # env 为环境参数, 如需线下测试短信请将参数改为 pro
     env: ${spring.profiles.active}
@@ -100,6 +101,17 @@ ali:
     template:
       # 验证码模板
       code: xxx
+
+  #支付
+  easyPay:
+    #小飞书科技公司
+    appId: 2021003141691367
+    privateKey: MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCdwsh8zKAqPzNv4w2PsZ2KuM9jExO+2cE5/x2lBvgWv3J2X+Fd5of44vER/cfKw5tiFosD+6BsaH4YNWoUnf1qsKNrlU37rN5ML4btULDYUM0v5ee7Gkz3tJ8ozPAZ9iKS6q0nmCjA4EoJQkGRFnPldAm9dg5ZS5IT1IpBEbl6GQVJbDT7ZhknnMDs5je8f/OhX9DwdUfh8FiGMMPZhyrMoA6iXDNdY6RdbX3Rk0j6KgIfvfTMrGmS91v5/QGVMLIMXemSuOavknqQzzmsX0cmwJTok1MY30dKSCpfXDaZmAK+X1hy9p+AesSz94Z/YgOGKh5Lj1SPJFwz32EuboAzAgMBAAECggEABmpKTtDfXnhtdgpMneBCIMb9H/FBp0whkGMwaGqNIhes5uVlO7VJKDTKSsoAGt2zbtyt0H6l+mKRZhid9LKsAG+oZZKPtkFEVOLF4NacKl+2yFDYCIK8SIJeyoDy7otUwpaqbebBGX7FY/T+x5CbK+R5FOw9DyKEkSveZ2D6It3bHfBcS6HmjxQcDwzQyhcZDQRAERlXcsUEE1teuRqB/Y++/hwtpIBTxqa37HYStjnpwVzKIt2xaGuC9Hg3TfbFunN3EFtJJD+ZNfziwpBbgfwJj3n+imfRuFOf2cFSfOc87oz9uJn33dNBtLFHkNeW7M71Zfi3MSRq0ume2CnFEQKBgQDlJvmPFLKfDQ8kIc+Ql+DyrslDYoadhld/IduZ7xRN4601GQAxQ5svzo7W4JMWmUJffjp3qH667CApLZHz55cugt636b7KvLRTjMBwk5s8wkkYmkgGyFSd+y+4zgB3cYpKr4dLrrZUvtN5o+LAuk4vMz51EnGaE6iehf/Uddch6QKBgQCwPowtcUwAfmQyiRt4qLbour+QBLgll5cJ9mWtqimPYgJ0TZf5MqpcpCXHAhmKPqW9Z7qs6o8PkMEqJ6imTNwc7GuMW511nhJdbPIvEb37X82x9DuK6Egs/kahqEzVhEwsgMdPLuhaJVobIjzmnFVExaCeR2sKg5cGdgUJVOsDuwKBgDirFcYjeTTKFvd5gQoh9Rguz0jhwaaNBXBEIDmGHUBR0JCz+Q81x9ffvgU3jkhlaDuTTMQwn/57zExCn7hwijuPU6KppGwglHug8Com5pn09fymkq9StVJIPvn1v7nKE0f69ntp3l9Ava10MOw2ZoVXp9dt0zgmKmnhe23AIo6ZAoGAIRoOT/aolKsofIld3IKrn/h7RDxurbjUCG372OtN1P1OgrOUKJzIfI/j/IW7cEil7nYODK4dYooIjbdXKKzk5pXM+Va3s0CWKG/u6MJHUXBD/PlnOYa5D6JOd8xZafzoJa+mP4wK3euICfKbR6DzLvCDY1b8lsPyWKdP+Nm3LkMCgYEAskJL9PxJHv1IsO1yjv6MWEMjtign5840nNG0ao+2RsNt25BluRlXVlohMaUPr9pUWX4ct9T1DKQxr6diwWNdmxMds1KsMK88Acb3vSZaQczI2esH+qFWz4PMX7UZFu5gWzs+B05nOEO3zdPbRmRwJb9ORU02nSsVxmMtY6VjSJo=
+    aliPayPublicKey: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAirV+s0j6j0pN4Mgi0S460ML3XUISn0fCvulCCaahD8UgS6pyx1metUl8TLrOBnzhqjLx/65d3X6NK+AzlgsPUm/ExO33zl0l6G9z3AKI6L9tFALuPZw7NvYkL4J1WRX2uJ5ulLS1DD7K4t+Vzt4HeqGgOnmwKL/DoRWtdJbrYMYzOBUr/VcoxM/oPNLUTybfoDr3bvxBf6FaPXLzh5JGGn3hvZlFUP+XxdFHv5NhYAKaP1f1rW3anWlNLbIS+1l3p21TDxc9gUxA8RCwDeNZhLB6cOkQvTD/LPMCQ32PZcy/IOFo8qDoz2NZmBNYH1xN5yJwJVoWOvBttQwfeMB/dQIDAQAB
+    #支付宝网关
+    gateway: https://openapi.alipay.com/gateway.do
+    #支付成功回调
+    notifyUrl: http://xx.xx
 
 
 # redis 配置
@@ -156,3 +168,5 @@ wx:
     aesKey: xxx
     # 微信小程序消息服务器配置的消息格式（可不填）
     msgDataFormat: json
+
+

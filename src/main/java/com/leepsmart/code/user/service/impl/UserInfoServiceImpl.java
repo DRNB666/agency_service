@@ -72,7 +72,7 @@ public class UserInfoServiceImpl extends CommonServiceImpl<UserInfoMapper, UserI
         } else {
             String account = "";
             UserInfo newUser = new UserInfo().setEmail(email).setLoginTime(new Date()).setLoginStatus(1)
-                    .setPassword((encoder.encode("123456" + KeyConfig.KEY_PWD))).setUpdateTime(new Date());
+                    .setPassword((encoder.encode("123456" + KeyConfig.KEY_PWD))).setUpdateTime(new Date()).setRoleId(1);
             while (true) {
                 String pre = "AGENCY-";
                 String acNumber = CommUtil.createRandom(false, 6);

@@ -1,5 +1,6 @@
 package com.leepsmart.code.system.controller;
 
+import cn.hutool.extra.qrcode.QrCodeUtil;
 import com.leepsmart.code.common.liebao.service.LieBaoService;
 import com.leepsmart.code.common.utils.returnbody.ReturnBody;
 import io.swagger.annotations.*;
@@ -9,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @ApiIgnore
 @Api(tags = "系统-测试")
@@ -27,9 +30,9 @@ public class SysTestController {
     
     @ApiOperation("测试")
     @PostMapping("test")
-    public String test(){
-        System.out.println("123");
-        String s = lieBaoService.facebookAccountSingle(269075532789786L);
-        return ReturnBody.success(s);
+    public void test(HttpServletResponse response) throws IOException {
+        QrCodeUtil.generate("https://url/path", 300, 300, "png", response.getOutputStream());
     }
+
+
 }

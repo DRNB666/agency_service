@@ -2,6 +2,10 @@ package com.leepsmart.code.admin.controller;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.leepsmart.code.common.annotation.parameterverify.ParameterVerify;
 import com.leepsmart.code.common.liebao.service.LieBaoService;
 import com.leepsmart.code.common.utils.CommUtil;
 import com.leepsmart.code.common.utils.page.pojo.PageInfo;
@@ -18,17 +22,14 @@ import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 @Api(tags = "后台-猎豹相关接口")
-@ApiResponses({
-        @ApiResponse(code = 200, message = "请求成功"),
-        @ApiResponse(code = 401, message = "无用户权限"),
-        @ApiResponse(code = 403, message = "无资源权限"),
-        @ApiResponse(code = 404, message = "找不到接口"),
-})
+@ApiResponses({@ApiResponse(code = 200, message = "请求成功"), @ApiResponse(code = 401, message = "无用户权限"), @ApiResponse(code = 403, message = "无资源权限"), @ApiResponse(code = 404, message = "找不到接口"),})
 @RestController
 @RequestMapping(value = "admin/lieBao", produces = "text/plain;charset=utf-8")
 public class AdLieBaoController {
@@ -40,28 +41,61 @@ public class AdLieBaoController {
 
     @ApiOperation("获取账户列表")
     @PostMapping("getLieBaoAccount")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "mediaType", value = "媒体选择0:全部 1:meta", required = true),
-            @ApiImplicitParam(name = "status", value = "状态选择0:全部 1:激活 2:禁用", required = true),
-    })
-    public String getLieBaoAccount(PageInfo pageInfo, Integer mediaType, Integer status) {
+    @ApiImplicitParams({@ApiImplicitParam(name = "mediaType", value = "媒体选择 1:meta", required = false), @ApiImplicitParam(name = "status", value = "状态选择0:全部 1:激活 2:禁用", required = true), @ApiImplicitParam(name = "keyword", value = "搜索关键字", required = false),})
+    public String getLieBaoAccount(PageInfo pageInfo, Integer mediaType, Integer status, String keyword) {
         pageInfo.setTimeScreen("create_time");
         pageInfo.setDefaultSort("create_time", SortWay.DESC);
         //执行分页辅助工具
-        PageResult<SysLieBaoAccount> pageResult = new PageUtil<SysLieBaoAccount>(pageInfo).startPage((page, queryWrapper) -> {
-            if (CommUtil.checkNull(status)&&status!=0){
-                queryWrapper.eq(SysLieBaoAccount.ACCOUNT_STATUS,status);
-            }
-            sysLieBaoAccountService.page(page,queryWrapper);
-        });
+        PageResult<SysLieBaoAccount> pageResult = new PageResult<>();
+        Page<SysLieBaoAccount> page = new Page<>(pageInfo.getPageNo(), pageInfo.getPageSize());
+        //这里是自定义sql
+        IPage<SysLieBaoAccount> iPage = sysLieBaoAccountService.accountList(page, new HashMap<String, Object>() {{
+            put("status", status);
+            put("keyword", keyword);
+        }});
+        pageResult.setPageSize(iPage.getSize()).setPageNo(iPage.getCurrent()).setPages(iPage.getPages()).setTotal(iPage.getTotal());
+        pageResult.setList(iPage.getRecords());
+
         return ReturnBody.success(pageResult);
+    }
+
+    @ApiOperation("绑定BM")
+    @PostMapping("bindBm")
+    @ApiImplicitParams({@ApiImplicitParam(name = "accountId", value = "猎豹账户id", required = true), @ApiImplicitParam(name = "bmId", value = "bmId", required = true), @ApiImplicitParam(name = "type", value = "绑定的权限类型 1查看广告表现 2管理广告系列", required = true),})
+    @ParameterVerify(notNull = {"accountId", "bmId", "type"})
+    public String bindBm(Long accountId, String bmId, Integer type) {
+        //查询账户列表是否存在该账户
+        QueryWrapper<SysLieBaoAccount> eq = new QueryWrapper<SysLieBaoAccount>().eq(SysLieBaoAccount.ACCOUNT_ID, accountId);
+        SysLieBaoAccount sysLieBaoAccount = sysLieBaoAccountService.getOne(eq);
+        if (!CommUtil.checkNull(sysLieBaoAccount)) {
+            return ReturnBody.error("账户不存在");
+        }
+        if (lieBaoService.facebookAccountGrant(String.valueOf(accountId), bmId, type)) {
+            return ReturnBody.success("绑定bm成功");
+        } else {
+            return ReturnBody.error("绑定bm失败");
+        }
+    }
+
+    @ApiOperation("查广告账户绑定的BM")
+    @PostMapping("bmList")
+    @ApiImplicitParams({@ApiImplicitParam(name = "accountId", value = "猎豹账户id", required = true),})
+    @ParameterVerify(notNull = "accountId")
+    public String bmList(Long accountId) {
+        //查询账户列表是否存在该账户
+        QueryWrapper<SysLieBaoAccount> eq = new QueryWrapper<SysLieBaoAccount>().eq(SysLieBaoAccount.ACCOUNT_ID, accountId);
+        SysLieBaoAccount sysLieBaoAccount = sysLieBaoAccountService.getOne(eq);
+        if (!CommUtil.checkNull(sysLieBaoAccount)) {
+            return ReturnBody.error("账户不存在");
+        }
+        String result = lieBaoService.businessAccountBindings(String.valueOf(accountId));
+        return ReturnBody.success(JSONArray.parseArray(result));
     }
 
     @ApiIgnore
     @ApiOperation("同步账户列表")
     @PostMapping("syncAccountList")
     public String syncAccountList(Integer agentType) {
-        //
         String accounts = lieBaoService.fbAccountList();
         JSONArray accountArray = JSONArray.parseArray(accounts);
         List<SysLieBaoAccount> sysLieBaoAccounts = new ArrayList<>();
@@ -93,6 +127,18 @@ public class AdLieBaoController {
         });
         sysLieBaoAccountService.syncAccountList(sysLieBaoAccounts);
         return ReturnBody.success();
+    }
+
+    @ApiOperation("充值")
+    @PostMapping("recharge")
+    @ApiImplicitParams({@ApiImplicitParam(name = "amount", value = "金额", required = true), @ApiImplicitParam(name = "accountId", value = "猎豹账户id", required = true),})
+    @ParameterVerify(notNull = {"amount", "accountId"})
+    public String recharge(BigDecimal amount, Long accountId) {
+        if (lieBaoService.facebookAccountRecharge(String.valueOf(accountId), amount)) {
+            return ReturnBody.success("充值成功");
+        } else {
+            return ReturnBody.error("充值错误，请联系平台");
+        }
     }
 
 

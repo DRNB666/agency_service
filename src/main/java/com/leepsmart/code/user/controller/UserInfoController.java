@@ -1,24 +1,18 @@
 package com.leepsmart.code.user.controller;
 
 import cn.binarywang.wx.miniapp.api.WxMaService;
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.date.TimeInterval;
-import com.alibaba.fastjson.JSON;
+import cn.hutool.extra.qrcode.QrCodeUtil;
 import com.alibaba.fastjson2.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.alipay.api.AlipayClient;
+import com.alipay.api.domain.AlipayTradeWapPayModel;
+import com.alipay.api.request.AlipayTradeWapPayRequest;
 import com.github.binarywang.wxpay.service.WxPayService;
+import com.leepsmart.code.common.alipay.service.AliPayService;
 import com.leepsmart.code.common.annotation.limiter.RequestLimiter;
 import com.leepsmart.code.common.annotation.parameterverify.ParameterVerify;
-import com.leepsmart.code.common.config.KeyConfig;
-import com.leepsmart.code.common.ex.ServiceException;
 import com.leepsmart.code.common.liebao.service.LieBaoService;
 import com.leepsmart.code.common.redis.utils.RedisUtil;
-import com.leepsmart.code.common.security.config.SecurityConfig;
-import com.leepsmart.code.common.security.jwt.JwtTokenUtil;
 import com.leepsmart.code.common.utils.*;
-import com.leepsmart.code.common.utils.encrypt.Base64Util;
 import com.leepsmart.code.common.utils.encrypt.RSAUtil;
 
 import com.leepsmart.code.common.utils.returnbody.Code;
@@ -26,15 +20,14 @@ import com.leepsmart.code.common.utils.returnbody.Code;
 import com.leepsmart.code.common.utils.returnbody.ResultCodeInfo;
 import com.leepsmart.code.common.utils.returnbody.ReturnBody;
 
+import com.leepsmart.code.system.service.SysLieBaoAccountService;
 import com.leepsmart.code.system.service.SysParamsService;
 
-import com.leepsmart.code.user.mapper.UserInfoMapper;
 import com.leepsmart.code.user.pojo.*;
 import com.leepsmart.code.user.service.*;
 import io.swagger.annotations.*;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,10 +36,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import javax.mail.MessagingException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -77,6 +71,11 @@ public class UserInfoController {
     private JavaMailSender emailSender;
     @Resource
     private LieBaoService lieBaoService;
+    @Resource
+    private SysLieBaoAccountService sysLieBaoAccountService;
+    @Resource
+    private AliPayService aliPayService;
+
     @Resource
     private RedisUtil redisUtil;
     @Value("${spring.profiles.active}")
@@ -165,6 +164,41 @@ public class UserInfoController {
             return ReturnBody.error(ResultCodeInfo.SERVICE_EXCEPTION);
         }
         return ReturnBody.success();
+    }
+
+    @ApiOperation("猎豹充值(获取二维码)")
+    @PostMapping("public/recharge")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "amount", value = "金额", required = true),
+            @ApiImplicitParam(name = "accountId", value = "猎豹账户id", required = true),
+    })
+    @ParameterVerify(notNull = {"amount","accountId"})
+    @RequestLimiter(qps = 1D)
+    public String recharge(BigDecimal amount, Long accountId, HttpServletResponse response){
+        //查询账户列表是否存在该账户
+//        Long rId = (Long) request.getAttribute("id");
+//        QueryWrapper<SysLieBaoAccount> eq =
+//                new QueryWrapper<SysLieBaoAccount>().eq(SysLieBaoAccount.USER_ID,rId).eq(SysLieBaoAccount.ACCOUNT_ID,accountId);
+//        SysLieBaoAccount sysLieBaoAccount = sysLieBaoAccountService.getOne(eq);
+//        if (!CommUtil.checkNull(sysLieBaoAccount)){
+//            return ReturnBody.error("账户不存在");
+//        }
+        //生成支付宝充值二维码
+        try {
+            String orderMobile = aliPayService.createOrderMobile();
+//            AlipayClient alipayClient = new DefaultAlipayClient(payConfig.getGateway(),payConfig.getAppId(),payConfig.getPrivateKey(),format,charset,alipayPublicKey,signType)
+//            Factory.setOptions(new Config());
+//            AlipayTradePrecreateResponse payResponse = Factory.Payment.FaceToFace().preCreate("订单主题：Mac笔记本", "LS123qwe123", "19999");
+//            String httpBodyStr = payResponse.getHttpBody();
+//            JSONObject jsonObject = JSONObject.parseObject(httpBodyStr);
+//            String qrUrl = jsonObject.getJSONObject("alipay_trade_precreate_response").get("qr_code").toString();
+            QrCodeUtil.generate(orderMobile, 300, 300, "png", response.getOutputStream());
+//            LogUtil.info("pay:{}",payConfig);
+        } catch (Exception e) {
+            LogUtil.error("生成支付宝二维码失败:{}",e);
+            return ReturnBody.error("生成支付宝二维码失败");
+        }
+        return null;
     }
     
 

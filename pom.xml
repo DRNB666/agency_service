@@ -161,6 +161,17 @@
             <version>1.0.0</version>
         </dependency>
 
+        <!-- 简易sdk只支持RSA2的加密方式 -->
+        <dependency>
+            <groupId>com.alipay.sdk</groupId>
+            <artifactId>alipay-easysdk</artifactId>
+            <version>2.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alipay.sdk</groupId>
+            <artifactId>alipay-sdk-java</artifactId>
+            <version>4.39.150.ALL</version>
+        </dependency>
         <!--
             工具集合
             api文档: https://hutool.cn/

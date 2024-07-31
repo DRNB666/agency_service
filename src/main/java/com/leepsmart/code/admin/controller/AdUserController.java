@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.leepsmart.code.admin.pojo.AdInfo;
 import com.leepsmart.code.admin.service.AdInfoService;
+import com.leepsmart.code.common.annotation.parameterverify.ParameterVerify;
 import com.leepsmart.code.common.config.KeyConfig;
 import com.leepsmart.code.common.utils.CommUtil;
 import com.leepsmart.code.common.utils.page.pojo.PageInfo;
@@ -60,6 +61,8 @@ public class AdUserController {
         return ReturnBody.success(pageResult);
     }
 
+
+
     @ApiOperation("设置用户为后台账号")
     @PostMapping("setUserByAccount")
     @ApiImplicitParams({
@@ -76,7 +79,8 @@ public class AdUserController {
         if (!CommUtil.checkNull(userInfo)) {
             return ReturnBody.error("用户账号不存在");
         }
-        AdInfo newAd = new AdInfo().setAccount(account).setPassword(encoder.encode("123123" + KeyConfig.KEY_PWD)).setEmail(userInfo.getEmail());
+        //角色默认管理员
+        AdInfo newAd = new AdInfo().setAccount(account).setPassword(encoder.encode("123123" + KeyConfig.KEY_PWD)).setEmail(userInfo.getEmail()).setRoleId(2);
         if (!adInfoService.save(newAd)) {
             return ReturnBody.error(ResultCodeInfo.SERVICE_EXCEPTION);
         }
@@ -89,6 +93,7 @@ public class AdUserController {
              @ApiImplicitParam(name = "usId", value = "用户id", required = true),
              @ApiImplicitParam(name = "accountId", value = "猎豹账户id", required = true),
      })
+    @ParameterVerify(notNull = {"usId","accountId"})
     public String bingLieBaoAcUser(Long usId,Long accountId){
         QueryWrapper<SysLieBaoAccount> eq = new QueryWrapper<SysLieBaoAccount>().eq(SysLieBaoAccount.ACCOUNT_ID, accountId).isNull(SysLieBaoAccount.USER_ID);
         SysLieBaoAccount sysLieBaoAccount = sysLieBaoAccountService.getOne(eq);
@@ -101,5 +106,26 @@ public class AdUserController {
         }
         return ReturnBody.success();
     }
+
+    @ApiOperation("取消绑定猎豹账户所属用户")
+    @PostMapping("cancelBingLieBaoAcUser")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "accountId", value = "猎豹账户id", required = true),
+    })
+    @ParameterVerify(notNull = "accountId")
+    public String cancelBingLieBaoAcUser(Long accountId){
+        QueryWrapper<SysLieBaoAccount> eq = new QueryWrapper<SysLieBaoAccount>().eq(SysLieBaoAccount.ACCOUNT_ID, accountId).isNull(SysLieBaoAccount.USER_ID);
+        SysLieBaoAccount sysLieBaoAccount = sysLieBaoAccountService.getOne(eq);
+        if (!CommUtil.checkNull(sysLieBaoAccount)){
+            return ReturnBody.error("账户已绑定或不存在");
+        }
+        sysLieBaoAccount.setUserId(null);
+        if (!sysLieBaoAccountService.updateById(sysLieBaoAccount)) {
+            return ReturnBody.error(ResultCodeInfo.SERVICE_EXCEPTION);
+        }
+        return ReturnBody.success();
+    }
+
+
 
 }

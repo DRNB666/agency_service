@@ -9,7 +9,63 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, account_id, account_status, account_name, spend_cap, amount_spent, total_amount_spent, disable_reason, created_time, currency, timezone_offset_hours_utc, balance, promotable_page_ids, promotable_urls, company_cn, company_en, funding_source_type, business_registration_id, request_id, disabled_transfer_amount, oe_id
+        id, account_id, account_status, account_name, spend_cap, amount_spent, total_amount_spent, disable_reason, created_time, currency, timezone_offset_hours_utc, balance, promotable_page_ids,
+        promotable_urls, company_cn, company_en, funding_source_detail, business_registration_id, request_id, disabled_transfer_amount, oe_id,user_id
     </sql>
+    <select id="accountList" resultType="com.leepsmart.code.admin.pojo.vo.SysLieBaoAccountVo">
+        select
+        slba.id as id,
+        slba.account_id as accountId,
+        slba.account_status as accountStatus,
+        slba.account_name as accountName,
+        slba.spend_cap as spendCap,
+        slba.amount_spent as amountSpent,
+        slba.total_amount_spent as totalAmountSpent,
+        slba.disable_reason as disableReason,
+        slba.created_time as createdTime,
+        slba.currency as currency,
+        slba.timezone_offset_hours_utc as timezoneOffsetHoursUtc,
+        slba.balance as balance,
+        slba.promotable_page_ids as promotablePageIds,
+        slba.promotable_urls as promotableUrls,
+        slba.company_cn as companyCn,
+        slba.company_en as companyEn,
+        slba.funding_source_detail as fundingSourceDetail,
+        slba.business_registration_id as businessRegistrationId,
+        slba.request_id as requestId,
+        slba.disabled_transfer_amount as disabledTransferAmount,
+        slba.oe_id as oeId,
+        ui.email as usEmail,
+        ui.mobile as usMobile,
+        ui.account as usAccount
+        from
+        sys_lie_bao_account slba left join user_info ui on slba.user_id = ui.id
+        <where>
+
+            <if test="map.keyword !=null and map.keyword.toString() !=''">
+                and
+                (
+                (slba.company_cn like concat('%',#{map.keyword},'%'))
+                or
+                (slba.account_name like concat('%',#{map.keyword},'%'))
+                or
+                (ui.mobile like concat('%',#{map.keyword},'%'))
+                or
+                (ui.email like concat('%',#{map.keyword},'%'))
+                or
+                (ui.account like concat('%',#{map.keyword},'%'))
+                )
+            </if>
+            <if test="map.status !=null and map.status !=0">
+                and slba.account_status = #{map.status}
+            </if>
+            <if test="map.usId !=null">
+                and slba.user_id = #{map.usId}
+            </if>
+
+        </where>
+        order by slba.create_time desc
+    </select>
+
 
 </mapper>

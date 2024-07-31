@@ -11,6 +11,7 @@ import com.leepsmart.code.user.pojo.UserMenu;
 import com.leepsmart.code.user.pojo.UserRoleMenu;
 import com.leepsmart.code.user.service.UserMenuService;
 import com.leepsmart.code.user.service.UserRoleMenuService;
+import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -20,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
 import java.util.List;
 
+@Component
 public class UsInterceptor implements HandlerInterceptor {
 
 

@@ -4,6 +4,8 @@ package com.leepsmart.code.user.controller;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.leepsmart.code.common.annotation.parameterverify.ParameterVerify;
 import com.leepsmart.code.common.liebao.service.LieBaoService;
 import com.leepsmart.code.common.utils.CommUtil;
@@ -28,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -73,51 +76,36 @@ public class UserLieBaoController {
         }
         return ReturnBody.success(link);
     }
-    
-    
+
+
 
     @ApiOperation("获取账户列表")
     @PostMapping("getLieBaoAccount")
-    @ApiImplicitParams({@ApiImplicitParam(name = "mediaType", value = "媒体选择0:全部 1:meta", required = true), @ApiImplicitParam(name = "status", value = "状态选择0:全部 1:激活 2:禁用", required = true),})
-    public String getLieBaoAccount(PageInfo pageInfo, Integer mediaType, Integer status) {
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "mediaType", value = "媒体选择 1:meta", required = false),
+            @ApiImplicitParam(name = "status", value = "状态选择0:全部 1:激活 2:禁用", required = true),
+            @ApiImplicitParam(name = "keyword", value = "搜索关键字", required = false),
+    })
+    public String getLieBaoAccount(PageInfo pageInfo, Integer mediaType, Integer status,String keyword) {
         Long rId = (Long) request.getAttribute("id");
-        pageInfo.setTimeScreen("create_time");
-        pageInfo.setDefaultSort("create_time", SortWay.DESC);
         //执行分页辅助工具
-        PageResult<SysLieBaoAccount> pageResult = new PageUtil<SysLieBaoAccount>(pageInfo).startPage((page, queryWrapper) -> {
-            if (CommUtil.checkNull(status)&&status!=0) {
-                queryWrapper.eq(SysLieBaoAccount.ACCOUNT_STATUS, status);
-            }
-            queryWrapper.eq(SysLieBaoAccount.USER_ID,rId);
-            sysLieBaoAccountService.page(page, queryWrapper);
-        });
+        PageResult<SysLieBaoAccount> pageResult = new PageResult<>();
+        Page<SysLieBaoAccount> page = new Page<>(pageInfo.getPageNo(), pageInfo.getPageSize());
+        //这里是自定义sql
+        IPage<SysLieBaoAccount> iPage = sysLieBaoAccountService.accountList(page,new HashMap<String, Object>(){{
+            put("usId",rId);
+            put("status",status);
+            put("keyword",keyword);
+        }});
+        pageResult.setPageSize(iPage.getSize()).setPageNo(iPage.getCurrent()).setPages(iPage.getPages()).
+                setTotal(iPage.getTotal());
+        pageResult.setList(iPage.getRecords());
+
         return ReturnBody.success(pageResult);
     }
 
 
-    
-    @ApiOperation("充值")
-    @PostMapping("recharge")
-    @ApiImplicitParams({
-             @ApiImplicitParam(name = "amount", value = "金额", required = true),
-             @ApiImplicitParam(name = "accountId", value = "猎豹账户id", required = true),
-     })
-    @ParameterVerify(notNull = {"amount","accountId"})
-    public String recharge(BigDecimal amount,Long accountId){
-        //查询账户列表是否存在该账户
-        Long rId = (Long) request.getAttribute("id");
-        QueryWrapper<SysLieBaoAccount> eq =
-                new QueryWrapper<SysLieBaoAccount>().eq(SysLieBaoAccount.USER_ID,rId).eq(SysLieBaoAccount.ACCOUNT_ID,accountId);
-        SysLieBaoAccount sysLieBaoAccount = sysLieBaoAccountService.getOne(eq);
-        if (!CommUtil.checkNull(sysLieBaoAccount)){
-            return ReturnBody.error("账户不存在");
-        }
-        if (lieBaoService.facebookAccountRecharge(String.valueOf(accountId),amount)) {
-            return ReturnBody.success("充值成功");
-        }else{
-            return ReturnBody.error("充值错误，请联系平台");
-        }
-    }
+
     
     @ApiOperation("绑定BM")
     @PostMapping("bindBm")
